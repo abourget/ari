@@ -1,4 +1,4 @@
-package arigo
+package ari
 
 type Message struct {
 	Type string

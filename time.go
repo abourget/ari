@@ -1,4 +1,4 @@
-package arigo
+package ari
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ func (j *AriTime) UnmarshalJSON(input []byte) error {
 	strInput = strings.Trim(strInput, `"`)
 	newTime, err := time.Parse("2006-01-02T15:04:05.999-0700", strInput)
 	if err != nil {
-		fmt.Println("ERROR PARSING ARITIME: %s", err)
+		//fmt.Printf(" - ERROR PARSING ARITIME: %s - ", err)
 		return fmt.Errorf("Error parsing AriTime: %s", err)
 	}
 	*j = AriTime(newTime)

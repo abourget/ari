@@ -1,6 +1,6 @@
-package arigo
+package ari
 
-// Package arigo implements the Asterisk ARI interface
+// Package ari implements the Asterisk ARI interface
 
 import (
 	"encoding/json"
@@ -39,11 +39,11 @@ func (ari *ARIClient) HandleReceive() {
 		rawMsg := []byte(msg)
 		err := json.Unmarshal(rawMsg, &data)
 		if err != nil {
-			fmt.Println("Error decoding incoming: %#v", msg)
+			fmt.Printf("Error decoding incoming '%#v': %s", msg, err)
 			continue
 		}
 
-		fmt.Printf("  -> %s", msg)
+		//fmt.Printf("  -> %s", msg)
 
 		msgType := data.Type
 		var recvMsg interface{}
@@ -57,7 +57,11 @@ func (ari *ARIClient) HandleReceive() {
 		default:
 			recvMsg = &data
 		}
-		json.Unmarshal(rawMsg, recvMsg)
+		err = json.Unmarshal(rawMsg, recvMsg)
+		if err != nil {
+			fmt.Println("Error decoding structured message: %#v", err)
+			continue
+		}
 
 		ari.ReceiveChan <- recvMsg
 	}

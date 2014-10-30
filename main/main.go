@@ -3,11 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/abourget/arigo"
+	"github.com/abourget/ari"
+	"github.com/kr/pretty"
 )
 
 func main() {
-	a := arigo.NewARI("asterisk", "asterisk", "localhost", 8088)
+	a := ari.NewARI("asterisk", "asterisk", "localhost", 8088)
 	err := a.Connect("hello-world")
 	fmt.Println("Connecting... ", err)
 
@@ -15,8 +16,8 @@ func main() {
 
 	for {
 		select {
-		case msg := <- a.ReceiveChan:
-			fmt.Printf("Received a message: %#v\n", msg)
+		case msg := <-a.ReceiveChan:
+			pretty.Printf("Received a message: %# v\n", msg)
 		}
 	}
 }
