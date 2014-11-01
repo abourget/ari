@@ -14,10 +14,14 @@ func main() {
 
 	go a.HandleReceive()
 
+
 	for {
 		select {
 		case msg := <-a.ReceiveChan:
 			pretty.Printf("Received a message: %# v\n", msg)
 		}
+
 	}
+
+
 }

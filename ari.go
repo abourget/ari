@@ -5,17 +5,18 @@ package ari
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"code.google.com/p/go.net/websocket"
 )
 
 type ARIClient struct {
-	ws       *websocket.Conn
-	hostname string
-	login    string
-	password string
-	port     int
-	ReceiveChan  chan interface{}
+	ws          *websocket.Conn
+	hostname    string
+	login       string
+	password    string
+	port        int
+	ReceiveChan chan interface{}
 }
 
 func NewARI(login, password, hostname string, port int) *ARIClient {
@@ -33,11 +34,16 @@ func (ari *ARIClient) HandleReceive() {
 	for {
 		fmt.Println("Listening using websocket.JSON.Receive...")
 		var msg string
-		websocket.Message.Receive(ari.ws, &msg)
+		err := websocket.Message.Receive(ari.ws, &msg)
+		if err != nil {
+			fmt.Println("Whoops, error reading from Socket, waiting 3 secs...")
+			time.Sleep(3 * time.Second)
+			continue
+		}
 
 		var data Message
 		rawMsg := []byte(msg)
-		err := json.Unmarshal(rawMsg, &data)
+		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
 			fmt.Printf("Error decoding incoming '%#v': %s", msg, err)
 			continue
@@ -54,6 +60,10 @@ func (ari *ARIClient) HandleReceive() {
 			recvMsg = &StasisEnd{}
 		case "ChannelVarset":
 			recvMsg = &ChannelVarset{}
+		case "ChannelDtmfReceived":
+			recvMsg = &ChannelDtmfReceived{}
+		case "ChannelHangupRequest":
+			recvMsg = &ChannelHangupRequest{}
 		default:
 			recvMsg = &data
 		}

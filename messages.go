@@ -13,7 +13,7 @@ type Event struct {
 type StasisStart struct {
 	Event
 	Args           []string
-	Channel        *Channel `json:"channel"`
+	Channel        *Channel
 	ReplaceChannel *Channel `json:"replace_channel"`
 }
 
@@ -29,6 +29,13 @@ type ChannelVarset struct {
 	Variable string
 }
 
+type ChannelHangupRequest struct {
+	Event
+	Cause   int
+	Channel *Channel
+	Soft    bool
+}
+
 type Channel struct {
 	Id           string
 	AccountCode  string
@@ -36,6 +43,13 @@ type Channel struct {
 	Connected    *CallerID
 	CreationTime *AriTime
 	Dialplan     *DialplanCEP
+}
+
+type ChannelDtmfReceived struct {
+	Event
+	Channel    *Channel
+	Digit      string
+	DurationMs int `json:"duration_ms"`
 }
 
 type CallerID struct {
