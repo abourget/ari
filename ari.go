@@ -11,34 +11,78 @@ import (
 )
 
 type ARIClient struct {
-	ws          *websocket.Conn
-	hostname    string
-	login       string
-	password    string
-	port        int
-	ReceiveChan chan interface{}
+	ws            *websocket.Conn
+	hostname      string
+	username      string
+	password      string
+	port          int
+	appName       string
+	reconnections int
+	ReceiveChan   chan interface{}
 }
 
-func NewARI(login, password, hostname string, port int) *ARIClient {
-	ari := ARIClient{hostname: hostname, port: port, login: login, password: password}
-	ari.ReceiveChan = make(chan interface{}, 100)
+func NewARI(username, password, hostname string, port int, appName string) *ARIClient {
+	ari := ARIClient{
+		hostname: hostname,
+		port:     port,
+		username: username,
+		password: password,
+		appName:  appName,
+	}
 	return &ari
 }
-func (ari *ARIClient) Connect(appName string) error {
-	ws, err := websocket.Dial(fmt.Sprintf("ws://%s:%d/ari/events?api_key=%s:%s&app=%s", ari.hostname, ari.port, ari.login, ari.password, appName), "", "http://localhost")
+
+func (ari *ARIClient) GetREST() *REST {
+	endpoint := fmt.Sprintf("http://%s:%d", ari.hostname, ari.port)
+	r := NewRest(endpoint, ari.username, ari.password)
+	return r
+}
+
+func (ari *ARIClient) LaunchListener() <-chan interface{} {
+	ch := make(chan interface{}, 100)
+	go ari.handleReceive(ch)
+	return ch
+}
+func (ari *ARIClient) handleReceive(ch chan<- interface{}) {
+	for {
+		ari.reconnect(ch)
+		ari.listenForMessages(ch)
+	}
+}
+
+func (ari *ARIClient) reconnect(ch chan<- interface{}) {
+	for {
+		err := ari.connect()
+
+		if err == nil {
+			// Connected successfully
+			fmt.Println("Connected to websocket successfully")
+			ch <- &AriConnected{ari.reconnections}
+			ari.reconnections += 1
+			return
+		}
+
+		fmt.Println("Error connecting, trying in 3 seconds:", err)
+		time.Sleep(3 * time.Second)
+		continue
+	}
+}
+
+func (ari *ARIClient) connect() error {
+	url := fmt.Sprintf("ws://%s:%d/ari/events?api_key=%s:%s&app=%s", ari.hostname, ari.port, ari.username, ari.password, ari.appName)
+	ws, err := websocket.Dial(url, "", "http://localhost")
 	ari.ws = ws
 	return err
 }
 
-func (ari *ARIClient) HandleReceive() {
+func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 	for {
-		fmt.Println("Listening using websocket.JSON.Receive...")
 		var msg string
 		err := websocket.Message.Receive(ari.ws, &msg)
 		if err != nil {
-			fmt.Println("Whoops, error reading from Socket, waiting 3 secs...")
-			time.Sleep(3 * time.Second)
-			continue
+			fmt.Println("Whoops, error reading from Socket, resetting connection")
+			ch <- &AriDisconnected{}
+			return
 		}
 
 		var data Message
@@ -73,6 +117,6 @@ func (ari *ARIClient) HandleReceive() {
 			continue
 		}
 
-		ari.ReceiveChan <- recvMsg
+		ch <- recvMsg
 	}
 }
