@@ -20,3 +20,10 @@ func (j *AriTime) UnmarshalJSON(input []byte) error {
 	*j = AriTime(newTime)
 	return nil
 }
+
+
+// FIXME: This doesn't work to improve "pretty.Formatter"
+func (j *AriTime) MarshalText() ([]byte, error) {
+	t := time.Time(*j)
+	return []byte(t.Format("2006-01-02T15:04:05.999-0700")), nil
+}

@@ -2,6 +2,7 @@ package rest
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 
 	"github.com/abourget/ari/models"
@@ -9,6 +10,7 @@ import (
 )
 
 type REST struct {
+	Debug    bool
 	endpoint string
 	session  *napping.Session
 }
@@ -25,6 +27,12 @@ func New(endpoint, username, password string) *REST {
 	}
 }
 
+func (r *REST) Log(format string, v ...interface{}) {
+	if r.Debug {
+		log.Printf(fmt.Sprintf("%s\n", format), v...)
+	}
+}
+
 //
 // napping Post/Get/Delete wrappers
 //
@@ -32,36 +40,45 @@ func New(endpoint, username, password string) *REST {
 func (r *REST) Post(url string, payload, results, errMsg interface{}) (*napping.Response, error) {
 	fullUrl := fmt.Sprintf("%s%s", r.endpoint, url)
 
+	r.Log("Sending POST request to %s", fullUrl)
 	res, err := r.session.Post(fullUrl, payload, results, errMsg)
 	if err == nil {
 		if res.Status() != 200 {
+			r.Log(" - Non-200 returned by server: %s", res.HttpResponse().Status)
 			return res, fmt.Errorf("Non-200 returned by server: %s", res.HttpResponse().Status)
 		}
 	}
+	r.Log(" - Success")
 	return res, err
 }
 
 func (r *REST) Get(url string, p *napping.Params, results, errMsg interface{}) (*napping.Response, error) {
 	fullUrl := fmt.Sprintf("%s/ari%s", r.endpoint, url)
 
+	r.Log("Sending GET request to %s", fullUrl)
 	res, err := r.session.Get(fullUrl, p, results, errMsg)
 	if err == nil {
 		if res.Status() != 200 {
+			r.Log(" - Non-200 returned by server: %s", res.HttpResponse().Status)
 			return res, fmt.Errorf("Non-200 returned by server: %s", res.HttpResponse().Status)
 		}
 	}
+	r.Log(" - Success")
 	return res, err
 }
 
 func (r *REST) Delete(url string, results, errMsg interface{}) (*napping.Response, error) {
 	fullUrl := fmt.Sprintf("%s/ari%s", r.endpoint, url)
 
+	r.Log("Sending GET request to %s", fullUrl)
 	res, err := r.session.Delete(fullUrl, results, errMsg)
 	if err == nil {
 		if res.Status() != 200 {
+			r.Log(" - Non-200 returned by server: %s", res.HttpResponse().Status)
 			return res, fmt.Errorf("Non-200 returned by server: %s", res.HttpResponse().Status)
 		}
 	}
+	r.Log(" - Success")
 	return res, err
 }
 

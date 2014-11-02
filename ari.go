@@ -14,6 +14,7 @@ import (
 )
 
 type ARIClient struct {
+	Debug bool
 	ws            *websocket.Conn
 	hostname      string
 	username      string
@@ -21,7 +22,6 @@ type ARIClient struct {
 	port          int
 	appName       string
 	reconnections int
-	ReceiveChan   chan interface{}
 }
 
 func NewARI(username, password, hostname string, port int, appName string) *ARIClient {

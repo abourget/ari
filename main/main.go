@@ -5,12 +5,15 @@ import (
 
 	"github.com/abourget/ari"
 	"github.com/abourget/ari/models"
+	"github.com/abourget/ari/rest"
 	"github.com/kr/pretty"
 )
 
 func main() {
 	a := ari.NewARI("asterisk", "asterisk", "localhost", 8088, "hello-world")
-	rest := a.GetREST()
+	a.Debug = true
+	r := a.GetREST()
+	r.Debug = true
 
 	receiveChan := a.LaunchListener()
 
@@ -19,20 +22,22 @@ func main() {
 		case msg := <-receiveChan:
 			switch m := msg.(type) {
 			case *models.AriConnected:
-				fmt.Println("Ok, connected, sending AsteriskInfo request")
-
-				infos, err := rest.AsteriskInfoGet()
+				infos, err := r.AsteriskInfoGet()
 				if err != nil {
 					fmt.Println("Couldn'get infos", err)
 				} else {
-					pretty.Printf("AsteriskInfos: %# v\n", infos)
+					pretty.Printf("Remote Asterisk version: %s\n", infos.System.Version)
 				}
-
-				if res, err := rest.AsteriskVariableGet("TRUNK"); err == nil {
-					fmt.Println("Got variable:", res)
-				}
-			case models.ChannelHangupRequest:
+			case *models.StasisStart:
+				r.ChannelsPlayPostById(m.Channel.Id, rest.PlayParams{
+					Media: "demo-congrats",
+				})
+			case *models.StasisEnd:
+				fmt.Println("Oh well, ended Stasis")
+			case *models.ChannelHangupRequest:
 				fmt.Printf("Hangup for channel %s\n", m.Channel)
+			case *models.ChannelVarset:
+				fmt.Printf("Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
 			default:
 				pretty.Printf("Received some message: %# v\n", msg)
 			}
