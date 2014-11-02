@@ -1,5 +1,7 @@
 package models
 
+// Package models implements the Asterisk ARI Messages structures.  See https://wiki.asterisk.org/wiki/display/AST/Asterisk+12+REST+Data+Models
+
 import "fmt"
 
 type Message struct {

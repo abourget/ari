@@ -1,5 +1,7 @@
 package rest
 
+// Package rest implements the Asterisk ARI REST interface. See: https://wiki.asterisk.org/wiki/display/AST/Asterisk+12+ARI
+
 import (
 	"fmt"
 	"log"

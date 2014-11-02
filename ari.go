@@ -1,6 +1,6 @@
 package ari
 
-// Package ari implements the Asterisk ARI interface
+// Package ari implements the Asterisk ARI interface. See: https://wiki.asterisk.org/wiki/display/AST/Asterisk+12+ARI
 
 import (
 	"encoding/json"

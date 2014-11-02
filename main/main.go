@@ -1,5 +1,7 @@
 package main
 
+// Package main is a demo of feature and a sample program that uses `ari`, `rest` and `models`.
+
 import (
 	"fmt"
 
