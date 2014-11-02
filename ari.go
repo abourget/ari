@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/abourget/ari/models"
+	ast "github.com/abourget/ari/models"
 	"github.com/abourget/ari/rest"
 
 	"code.google.com/p/go.net/websocket"
@@ -60,7 +60,7 @@ func (ari *ARIClient) reconnect(ch chan<- interface{}) {
 		if err == nil {
 			// Connected successfully
 			fmt.Println("Connected to websocket successfully")
-			ch <- &models.AriConnected{ari.reconnections}
+			ch <- &ast.AriConnected{ari.reconnections}
 			ari.reconnections += 1
 			return
 		}
@@ -84,11 +84,11 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		err := websocket.Message.Receive(ari.ws, &msg)
 		if err != nil {
 			fmt.Println("Whoops, error reading from Socket, resetting connection")
-			ch <- &models.AriDisconnected{}
+			ch <- &ast.AriDisconnected{}
 			return
 		}
 
-		var data models.Message
+		var data ast.Message
 		rawMsg := []byte(msg)
 		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
@@ -102,19 +102,29 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		var recvMsg interface{}
 		switch msgType {
 		case "ChannelVarset":
-			recvMsg = &models.ChannelVarset{}
+			recvMsg = &ast.ChannelVarset{}
 		case "ChannelDtmfReceived":
-			recvMsg = &models.ChannelDtmfReceived{}
+			recvMsg = &ast.ChannelDtmfReceived{}
 		case "ChannelHangupRequest":
-			recvMsg = &models.ChannelHangupRequest{}
+			recvMsg = &ast.ChannelHangupRequest{}
 		case "StasisStart":
-			recvMsg = &models.StasisStart{}
+			recvMsg = &ast.StasisStart{}
 		case "PlaybackStarted":
-			recvMsg = &models.PlaybackStarted{}
+			recvMsg = &ast.PlaybackStarted{}
 		case "PlaybackFinished":
-			recvMsg = &models.PlaybackFinished{}
+			recvMsg = &ast.PlaybackFinished{}
+		case "ChannelTalkingStarted":
+			recvMsg = &ast.ChannelTalkingStarted{}
+		case "ChannelTalkingFinished":
+			recvMsg = &ast.ChannelTalkingFinished{}
+		case "ChannelDialplan":
+			recvMsg = &ast.ChannelDialplan{}
+		case "ChannelCreated":
+			recvMsg = &ast.ChannelCreated{}
+		case "ChannelDestroyed":
+			recvMsg = &ast.ChannelDestroyed{}
 		case "StasisEnd":
-			recvMsg = &models.StasisEnd{}
+			recvMsg = &ast.StasisEnd{}
 		default:
 			recvMsg = &data
 		}

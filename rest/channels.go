@@ -174,6 +174,7 @@ func (r *REST) ChannelsSilenceDeleteById(channelId string) error {
 	return err
 }
 
+// ChannelsPlayPostById posts to /channels/{channelId}/play. See: https://wiki.asterisk.org/wiki/display/AST/ARI+and+Channels%3A+Simple+Media+Manipulation
 func (r *REST) ChannelsPlayPostById(channelId string, params PlayParams) (*models.Playback, error) {
 	var out models.Playback
 

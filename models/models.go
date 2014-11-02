@@ -71,6 +71,36 @@ type ChannelDtmfReceived struct {
 	DurationMs int `json:"duration_ms"`
 }
 
+type ChannelTalkingStarted struct {
+	Event
+	Channel *Channel
+}
+
+type ChannelTalkingFinished struct {
+	Event
+	Channel  *Channel
+	Duration int64
+}
+
+type ChannelDialplan struct {
+	Event
+	Channel         *Channel
+	DialplanApp     string `json:"dialplan_app"`
+	DialplanAppData string `json:"dialplan_app_data"`
+}
+
+type ChannelCreated struct {
+	Event
+	Channel *Channel
+}
+
+type ChannelDestroyed struct {
+	Event
+	Channel  *Channel
+	Cause    int64
+	CauseTxt string `json:"cause_txt"`
+}
+
 type CallerID struct {
 	Name   string
 	Number string

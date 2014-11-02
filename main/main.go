@@ -36,7 +36,7 @@ func main() {
 
 			case *ast.StasisStart:
 				r.ChannelsPlayPostById(m.Channel.Id, rest.PlayParams{
-					Media: "demo-moreinfo",
+					Media: "sound:demo-moreinfo",
 				})
 			case *ast.StasisEnd:
 				fmt.Println("Oh well, ended Stasis")
