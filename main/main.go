@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/abourget/ari"
+	"github.com/abourget/ari/models"
 	"github.com/kr/pretty"
 )
 
@@ -17,7 +18,7 @@ func main() {
 		select {
 		case msg := <-receiveChan:
 			switch m := msg.(type) {
-			case *ari.AriConnected:
+			case *models.AriConnected:
 				fmt.Println("Ok, connected, sending AsteriskInfo request")
 
 				infos, err := rest.AsteriskInfoGet()
@@ -30,7 +31,7 @@ func main() {
 				if res, err := rest.AsteriskVariableGet("TRUNK"); err == nil {
 					fmt.Println("Got variable:", res)
 				}
-			case ari.ChannelHangupRequest:
+			case models.ChannelHangupRequest:
 				fmt.Printf("Hangup for channel %s\n", m.Channel)
 			default:
 				pretty.Printf("Received some message: %# v\n", msg)

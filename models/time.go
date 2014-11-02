@@ -1,4 +1,4 @@
-package ari
+package models
 
 import (
 	"fmt"

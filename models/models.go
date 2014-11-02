@@ -1,4 +1,4 @@
-package ari
+package models
 
 import "fmt"
 
@@ -78,10 +78,29 @@ func (c *CallerID) String() string {
 	return fmt.Sprintf("%s <%s>", c.Name, c.Number)
 }
 
+type Playback struct {
+	Id        string
+	Language  string
+	MediaURI  string `json:"media_uri"`
+	State     string
+	TargetURI string `json:"target_uri"`
+}
+
 type DialplanCEP struct {
 	Context  string
 	Exten    string
 	Priority int
+}
+
+type LiveRecording struct {
+	Cause           string
+	Duration        *int64
+	Format          string
+	Name            string
+	SilenceDuration *int64 `json:"silence_duration"`
+	State           string
+	TalkingDuration *int64  `json:"talking_duration"`
+	TargetURI       string `json:"target_uri"`
 }
 
 //

@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/abourget/ari/models"
+	"github.com/abourget/ari/rest"
+
 	"code.google.com/p/go.net/websocket"
 )
 
@@ -32,9 +35,9 @@ func NewARI(username, password, hostname string, port int, appName string) *ARIC
 	return &ari
 }
 
-func (ari *ARIClient) GetREST() *REST {
+func (ari *ARIClient) GetREST() *rest.REST {
 	endpoint := fmt.Sprintf("http://%s:%d", ari.hostname, ari.port)
-	r := NewRest(endpoint, ari.username, ari.password)
+	r := rest.New(endpoint, ari.username, ari.password)
 	return r
 }
 
@@ -57,7 +60,7 @@ func (ari *ARIClient) reconnect(ch chan<- interface{}) {
 		if err == nil {
 			// Connected successfully
 			fmt.Println("Connected to websocket successfully")
-			ch <- &AriConnected{ari.reconnections}
+			ch <- &models.AriConnected{ari.reconnections}
 			ari.reconnections += 1
 			return
 		}
@@ -81,11 +84,11 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		err := websocket.Message.Receive(ari.ws, &msg)
 		if err != nil {
 			fmt.Println("Whoops, error reading from Socket, resetting connection")
-			ch <- &AriDisconnected{}
+			ch <- &models.AriDisconnected{}
 			return
 		}
 
-		var data Message
+		var data models.Message
 		rawMsg := []byte(msg)
 		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
@@ -99,15 +102,15 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		var recvMsg interface{}
 		switch msgType {
 		case "StasisStart":
-			recvMsg = &StasisStart{}
+			recvMsg = &models.StasisStart{}
 		case "StasisEnd":
-			recvMsg = &StasisEnd{}
+			recvMsg = &models.StasisEnd{}
 		case "ChannelVarset":
-			recvMsg = &ChannelVarset{}
+			recvMsg = &models.ChannelVarset{}
 		case "ChannelDtmfReceived":
-			recvMsg = &ChannelDtmfReceived{}
+			recvMsg = &models.ChannelDtmfReceived{}
 		case "ChannelHangupRequest":
-			recvMsg = &ChannelHangupRequest{}
+			recvMsg = &models.ChannelHangupRequest{}
 		default:
 			recvMsg = &data
 		}
