@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/abourget/ari"
-	"github.com/abourget/ari/models"
+	ast "github.com/abourget/ari/models"
 	"github.com/abourget/ari/rest"
 	"github.com/kr/pretty"
 )
@@ -21,22 +21,28 @@ func main() {
 		select {
 		case msg := <-receiveChan:
 			switch m := msg.(type) {
-			case *models.AriConnected:
+			case *ast.AriConnected:
 				infos, err := r.AsteriskInfoGet()
 				if err != nil {
 					fmt.Println("Couldn'get infos", err)
 				} else {
 					pretty.Printf("Remote Asterisk version: %s\n", infos.System.Version)
 				}
-			case *models.StasisStart:
+
+				//lst, _ := r.SoundsGet("", "")
+				//pretty.Printf("Sounds found: %# v\n", lst)
+
+			case *ast.StasisStart:
 				r.ChannelsPlayPostById(m.Channel.Id, rest.PlayParams{
-					Media: "demo-congrats",
+					Media: "demo-moreinfo",
 				})
-			case *models.StasisEnd:
+			case *ast.StasisEnd:
 				fmt.Println("Oh well, ended Stasis")
-			case *models.ChannelHangupRequest:
+			case *ast.ChannelDtmfReceived:
+				fmt.Println("Got DTMF:", m.Digit)
+			case *ast.ChannelHangupRequest:
 				fmt.Printf("Hangup for channel %s\n", m.Channel)
-			case *models.ChannelVarset:
+			case *ast.ChannelVarset:
 				fmt.Printf("Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
 			default:
 				pretty.Printf("Received some message: %# v\n", msg)

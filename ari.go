@@ -101,16 +101,20 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		msgType := data.Type
 		var recvMsg interface{}
 		switch msgType {
-		case "StasisStart":
-			recvMsg = &models.StasisStart{}
-		case "StasisEnd":
-			recvMsg = &models.StasisEnd{}
 		case "ChannelVarset":
 			recvMsg = &models.ChannelVarset{}
 		case "ChannelDtmfReceived":
 			recvMsg = &models.ChannelDtmfReceived{}
 		case "ChannelHangupRequest":
 			recvMsg = &models.ChannelHangupRequest{}
+		case "StasisStart":
+			recvMsg = &models.StasisStart{}
+		case "PlaybackStarted":
+			recvMsg = &models.PlaybackStarted{}
+		case "PlaybackFinished":
+			recvMsg = &models.PlaybackFinished{}
+		case "StasisEnd":
+			recvMsg = &models.StasisEnd{}
 		default:
 			recvMsg = &data
 		}

@@ -78,6 +78,12 @@ func (c *CallerID) String() string {
 	return fmt.Sprintf("%s <%s>", c.Name, c.Number)
 }
 
+type Sound struct {
+	Formats []FormatLangPair
+	Id      string
+	Text    string
+}
+
 type Playback struct {
 	Id        string
 	Language  string
@@ -99,8 +105,21 @@ type LiveRecording struct {
 	Name            string
 	SilenceDuration *int64 `json:"silence_duration"`
 	State           string
-	TalkingDuration *int64  `json:"talking_duration"`
+	TalkingDuration *int64 `json:"talking_duration"`
 	TargetURI       string `json:"target_uri"`
+}
+
+type FormatLangPair struct {
+	Format   string
+	Language string
+}
+
+type PlaybackStarted struct {
+	Playback Playback
+}
+
+type PlaybackFinished struct {
+	Playback Playback
 }
 
 //
