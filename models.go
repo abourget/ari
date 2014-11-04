@@ -1,4 +1,4 @@
-package models
+package ari
 
 // Package models implements the Asterisk ARI Messages structures.  See https://wiki.asterisk.org/wiki/display/AST/Asterisk+12+REST+Data+Models
 
@@ -11,7 +11,7 @@ type Message struct {
 type Event struct {
 	Message
 	Application string
-	Timestamp   *AriTime
+	Timestamp   *Time
 }
 
 type StasisStart struct {
@@ -42,26 +42,6 @@ type ChannelHangupRequest struct {
 	Cause   int
 	Channel *Channel
 	Soft    bool
-}
-
-type Channel struct {
-	Id           string
-	AccountCode  string
-	Caller       *CallerID
-	Connected    *CallerID
-	CreationTime *AriTime
-	Dialplan     *DialplanCEP
-}
-
-func (c Channel) String() string {
-	s := fmt.Sprintf("Channel %s", c.Id)
-	if c.Caller != nil {
-		s = fmt.Sprintf(", caller=%s", c.Caller)
-	}
-	if c.Connected != nil {
-		s = fmt.Sprintf(", with=%s", c.Connected)
-	}
-	return s
 }
 
 type ChannelDtmfReceived struct {
@@ -116,13 +96,6 @@ type Sound struct {
 	Text    string
 }
 
-type Playback struct {
-	Id        string
-	Language  string
-	MediaURI  string `json:"media_uri"`
-	State     string
-	TargetURI string `json:"target_uri"`
-}
 
 type DialplanCEP struct {
 	Context  string
@@ -188,8 +161,8 @@ type SetId struct {
 }
 
 type StatusInfo struct {
-	LastReloadTime *AriTime `json:"last_reload_time"`
-	StartupTime    *AriTime `json:"startup_time"`
+	LastReloadTime *Time `json:"last_reload_time"`
+	StartupTime    *Time `json:"startup_time"`
 }
 
 type SystemInfo struct {

@@ -6,25 +6,21 @@ import (
 	"fmt"
 
 	"github.com/abourget/ari"
-	ast "github.com/abourget/ari/models"
-	"github.com/abourget/ari/rest"
 	"github.com/kr/pretty"
 )
 
 func main() {
-	a := ari.NewARI("asterisk", "asterisk", "localhost", 8088, "hello-world")
-	a.Debug = true
-	r := a.GetREST()
-	r.Debug = true
+	c := ari.NewClient("asterisk", "asterisk", "localhost", 8088, "hello-world")
+	c.Debug = true
 
-	receiveChan := a.LaunchListener()
+	receiveChan := c.LaunchListener()
 
 	for {
 		select {
 		case msg := <-receiveChan:
 			switch m := msg.(type) {
-			case *ast.AriConnected:
-				infos, err := r.AsteriskInfoGet()
+			case *ari.AriConnected:
+				infos, err := c.Asterisk.GetInfo()
 				if err != nil {
 					fmt.Println("Couldn'get infos", err)
 				} else {
@@ -34,17 +30,22 @@ func main() {
 				//lst, _ := r.SoundsGet("", "")
 				//pretty.Printf("Sounds found: %# v\n", lst)
 
-			case *ast.StasisStart:
-				r.ChannelsPlayPostById(m.Channel.Id, rest.PlayParams{
+			case *ari.StasisStart:
+				m.Channel.Play(ari.PlayParams{
 					Media: "sound:demo-moreinfo",
 				})
-			case *ast.StasisEnd:
+				m.Channel.SetVar("TALK_DETECT(set)", "")
+			case *ari.StasisEnd:
 				fmt.Println("Oh well, ended Stasis")
-			case *ast.ChannelDtmfReceived:
+			case *ari.ChannelDtmfReceived:
 				fmt.Println("Got DTMF:", m.Digit)
-			case *ast.ChannelHangupRequest:
+			case *ari.ChannelTalkingStarted:
+				fmt.Println("They started talking!")
+			case *ari.ChannelTalkingFinished:
+				fmt.Println("They stopped talking! Talked for", m.Duration, "ms")
+			case *ari.ChannelHangupRequest:
 				fmt.Printf("Hangup for channel %s\n", m.Channel)
-			case *ast.ChannelVarset:
+			case *ari.ChannelVarset:
 				fmt.Printf("Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
 			default:
 				pretty.Printf("Received some message: %# v\n", msg)

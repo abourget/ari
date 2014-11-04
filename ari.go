@@ -5,16 +5,17 @@ package ari
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"net/url"
 	"time"
 
-	ast "github.com/abourget/ari/models"
-	"github.com/abourget/ari/rest"
+	"github.com/jmcvetta/napping"
 
 	"code.google.com/p/go.net/websocket"
 )
 
-type ARIClient struct {
-	Debug bool
+type Client struct {
+	Debug         bool
 	ws            *websocket.Conn
 	hostname      string
 	username      string
@@ -22,46 +23,77 @@ type ARIClient struct {
 	port          int
 	appName       string
 	reconnections int
+
+	session  *napping.Session
+	endpoint string
+
+	// Services
+	Channels     *ChannelService
+	Bridges      *BridgeService
+	Applications *ApplicationService
+	Asterisk     *AsteriskService
+	DeviceStates *DeviceStateService
+	Endpoints    *EndpointService
+	Events       *EventService
+	Mailboxes    *MailboxService
+	Playbacks    *PlaybackService
+	Recordings   *RecordingService
+	Sounds       *SoundService
 }
 
-func NewARI(username, password, hostname string, port int, appName string) *ARIClient {
-	ari := ARIClient{
+func NewClient(username, password, hostname string, port int, appName string) *Client {
+	userinfo := url.UserPassword(username, password)
+	endpoint := fmt.Sprintf("http://%s:%d", hostname, port)
+
+	c := &Client{
 		hostname: hostname,
 		port:     port,
 		username: username,
 		password: password,
 		appName:  appName,
+		session: &napping.Session{
+			Userinfo:        userinfo,
+			UnsafeBasicAuth: true,
+		},
+		endpoint: endpoint,
 	}
-	return &ari
+	c.Channels = &ChannelService{client: c}
+	c.Bridges = &BridgeService{client: c}
+	c.Sounds = &SoundService{client: c}
+	c.Playbacks = &PlaybackService{client: c}
+	c.Asterisk = &AsteriskService{client: c}
+	c.Mailboxes = &MailboxService{client: c}
+	c.Recordings = &RecordingService{client: c}
+	c.Events = &EventService{client: c}
+	c.Applications = &ApplicationService{client: c}
+	c.DeviceStates = &DeviceStateService{client: c}
+	c.Endpoints = &EndpointService{client: c}
+
+	return c
 }
 
-func (ari *ARIClient) GetREST() *rest.REST {
-	endpoint := fmt.Sprintf("http://%s:%d", ari.hostname, ari.port)
-	r := rest.New(endpoint, ari.username, ari.password)
-	return r
-}
-
-func (ari *ARIClient) LaunchListener() <-chan interface{} {
+func (c *Client) LaunchListener() <-chan interface{} {
 	ch := make(chan interface{}, 100)
-	go ari.handleReceive(ch)
+	go c.handleReceive(ch)
 	return ch
 }
-func (ari *ARIClient) handleReceive(ch chan<- interface{}) {
+
+func (c *Client) handleReceive(ch chan<- interface{}) {
 	for {
-		ari.reconnect(ch)
-		ari.listenForMessages(ch)
+		c.reconnect(ch)
+		c.listenForMessages(ch)
 	}
 }
 
-func (ari *ARIClient) reconnect(ch chan<- interface{}) {
+func (c *Client) reconnect(ch chan<- interface{}) {
 	for {
-		err := ari.connect()
+		err := c.connect()
 
 		if err == nil {
 			// Connected successfully
 			fmt.Println("Connected to websocket successfully")
-			ch <- &ast.AriConnected{ari.reconnections}
-			ari.reconnections += 1
+			ch <- &AriConnected{c.reconnections}
+			c.reconnections += 1
 			return
 		}
 
@@ -71,24 +103,24 @@ func (ari *ARIClient) reconnect(ch chan<- interface{}) {
 	}
 }
 
-func (ari *ARIClient) connect() error {
-	url := fmt.Sprintf("ws://%s:%d/ari/events?api_key=%s:%s&app=%s", ari.hostname, ari.port, ari.username, ari.password, ari.appName)
+func (c *Client) connect() error {
+	url := fmt.Sprintf("ws://%s:%d/ari/events?api_key=%s:%s&app=%s", c.hostname, c.port, c.username, c.password, c.appName)
 	ws, err := websocket.Dial(url, "", "http://localhost")
-	ari.ws = ws
+	c.ws = ws
 	return err
 }
 
-func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
+func (c *Client) listenForMessages(ch chan<- interface{}) {
 	for {
 		var msg string
-		err := websocket.Message.Receive(ari.ws, &msg)
+		err := websocket.Message.Receive(c.ws, &msg)
 		if err != nil {
 			fmt.Println("Whoops, error reading from Socket, resetting connection")
-			ch <- &ast.AriDisconnected{}
+			ch <- &AriDisconnected{}
 			return
 		}
 
-		var data ast.Message
+		var data Message
 		rawMsg := []byte(msg)
 		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
@@ -102,29 +134,29 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		var recvMsg interface{}
 		switch msgType {
 		case "ChannelVarset":
-			recvMsg = &ast.ChannelVarset{}
+			recvMsg = &ChannelVarset{}
 		case "ChannelDtmfReceived":
-			recvMsg = &ast.ChannelDtmfReceived{}
+			recvMsg = &ChannelDtmfReceived{}
 		case "ChannelHangupRequest":
-			recvMsg = &ast.ChannelHangupRequest{}
+			recvMsg = &ChannelHangupRequest{}
 		case "StasisStart":
-			recvMsg = &ast.StasisStart{}
+			recvMsg = &StasisStart{}
 		case "PlaybackStarted":
-			recvMsg = &ast.PlaybackStarted{}
+			recvMsg = &PlaybackStarted{}
 		case "PlaybackFinished":
-			recvMsg = &ast.PlaybackFinished{}
+			recvMsg = &PlaybackFinished{}
 		case "ChannelTalkingStarted":
-			recvMsg = &ast.ChannelTalkingStarted{}
+			recvMsg = &ChannelTalkingStarted{}
 		case "ChannelTalkingFinished":
-			recvMsg = &ast.ChannelTalkingFinished{}
+			recvMsg = &ChannelTalkingFinished{}
 		case "ChannelDialplan":
-			recvMsg = &ast.ChannelDialplan{}
+			recvMsg = &ChannelDialplan{}
 		case "ChannelCreated":
-			recvMsg = &ast.ChannelCreated{}
+			recvMsg = &ChannelCreated{}
 		case "ChannelDestroyed":
-			recvMsg = &ast.ChannelDestroyed{}
+			recvMsg = &ChannelDestroyed{}
 		case "StasisEnd":
-			recvMsg = &ast.StasisEnd{}
+			recvMsg = &StasisEnd{}
 		default:
 			recvMsg = &data
 		}
@@ -135,5 +167,11 @@ func (ari *ARIClient) listenForMessages(ch chan<- interface{}) {
 		}
 
 		ch <- recvMsg
+	}
+}
+
+func (c *Client) Log(format string, v ...interface{}) {
+	if c.Debug {
+		log.Printf(fmt.Sprintf("%s\n", format), v...)
 	}
 }
