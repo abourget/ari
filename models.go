@@ -120,11 +120,11 @@ type FormatLangPair struct {
 }
 
 type PlaybackStarted struct {
-	Playback Playback
+	Playback *Playback
 }
 
 type PlaybackFinished struct {
-	Playback Playback
+	Playback *Playback
 }
 
 //

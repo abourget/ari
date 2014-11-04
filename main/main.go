@@ -4,6 +4,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/abourget/ari"
 	"github.com/kr/pretty"
@@ -47,6 +48,9 @@ func main() {
 				fmt.Printf("Hangup for channel %s\n", m.Channel)
 			case *ari.ChannelVarset:
 				fmt.Printf("Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
+			case *ari.PlaybackStarted:
+				time.Sleep(1 * time.Second)
+				m.Playback.Stop()
 			default:
 				pretty.Printf("Received some message: %# v\n", msg)
 			}

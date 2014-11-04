@@ -20,6 +20,8 @@ func (s *ChannelService) List() ([]*Channel, error) {
 	if _, err := s.client.Get("/channels", nil, &out, nil); err != nil {
 		return nil, err
 	}
+
+	s.client.setClientRecurse(out)
 	return out, nil
 }
 
@@ -29,7 +31,7 @@ func (s *ChannelService) Create(params OriginateParams) (*Channel, error) {
 		return nil, err
 	}
 
-	out.client = s.client
+	out.setClient(s.client)
 	return &out, nil
 }
 
@@ -40,7 +42,7 @@ func (s *ChannelService) Get(channelId string) (*Channel, error) {
 		return nil, err
 	}
 
-	out.client = s.client
+	out.setClient(s.client)
 	return &out, nil
 }
 
@@ -77,6 +79,12 @@ type Channel struct {
 
 	// For further manipulations
 	client *Client
+}
+
+func (c *Channel) setClient(client *Client) {
+	if c != nil {
+		c.client = client
+	}
 }
 
 func (c *Channel) String() string {
@@ -265,7 +273,7 @@ func (c *Channel) Snoop(params SnoopParams) (*Channel, error) {
 		return nil, err
 	}
 
-	out.client = c.client
+	out.setClient(c.client)
 	return &out, nil
 
 }

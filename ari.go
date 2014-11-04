@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"net/url"
+	"reflect"
 	"time"
 
 	"github.com/jmcvetta/napping"
@@ -161,10 +162,13 @@ func (c *Client) listenForMessages(ch chan<- interface{}) {
 			recvMsg = &data
 		}
 		err = json.Unmarshal(rawMsg, recvMsg)
+
 		if err != nil {
 			fmt.Println("Error decoding structured message: %#v", err)
 			continue
 		}
+
+		c.setClientRecurse(recvMsg)
 
 		ch <- recvMsg
 	}
@@ -174,4 +178,49 @@ func (c *Client) Log(format string, v ...interface{}) {
 	if c.Debug {
 		log.Printf(fmt.Sprintf("%s\n", format), v...)
 	}
+}
+
+func (c *Client) setClientRecurse(recvMsg interface{}) {
+	original := reflect.ValueOf(recvMsg)
+	doAssignClient(c, original)
+}
+
+func doAssignClient(c *Client, original reflect.Value) {
+	// based off: https://gist.github.com/hvoecking/10772475
+	if original.CanInterface() {
+		iface := original.Interface()
+		setter, ok := iface.(clientSetter)
+		if ok {
+			setter.setClient(c)
+			return
+		}
+	}
+
+	switch original.Kind() {
+	case reflect.Ptr:
+		originalVal := original.Elem()
+		if !originalVal.IsValid() {
+			return
+		}
+		doAssignClient(c, originalVal)
+	//case reflect.Interface:
+	//	originalVal := original.Interface()
+	//	doAssignClient(c, originalVal)
+	case reflect.Struct:
+		for i := 0; i < original.NumField(); i += 1 {
+			doAssignClient(c, original.Field(i))
+		}
+
+	case reflect.Slice:
+		for i := 0; i < original.Len(); i += 1 {
+			doAssignClient(c, original.Index(i))
+		}
+		//case reflect.Map:
+		// we don't have that case in our model
+		//default:
+	}
+}
+
+type clientSetter interface {
+	setClient(*Client)
 }

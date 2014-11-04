@@ -19,7 +19,7 @@ func (s *PlaybackService) Get(playbackId string) (*Playback, error) {
 		return nil, err
 	}
 
-	out.client = s.client
+	out.setClient(s.client)
 	return &out, nil
 }
 
@@ -36,6 +36,12 @@ type Playback struct {
 
 	// For further manipulations
 	client *Client
+}
+
+func (p *Playback) setClient(client *Client) {
+	if p != nil {
+		p.client = client
+	}
 }
 
 func (p *Playback) Stop() error {
