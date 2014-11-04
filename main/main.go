@@ -49,8 +49,12 @@ func main() {
 			case *ari.ChannelVarset:
 				fmt.Printf("Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
 			case *ari.PlaybackStarted:
-				time.Sleep(1 * time.Second)
-				m.Playback.Stop()
+				go func() {
+					time.Sleep(2 * time.Second)
+					m.Playback.Stop()
+				}()
+			case *ari.PlaybackFinished:
+				fmt.Println("Playback finished: ", m.Playback.MediaURI)
 			default:
 				pretty.Printf("Received some message: %# v\n", msg)
 			}
