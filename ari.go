@@ -182,11 +182,19 @@ func (c *Client) Log(format string, v ...interface{}) {
 
 func (c *Client) setClientRecurse(recvMsg interface{}) {
 	original := reflect.ValueOf(recvMsg)
-	doAssignClient(c, original)
+	doAssignClient(c, original, 0)
 }
 
-func doAssignClient(c *Client, original reflect.Value) {
+func doAssignClient(c *Client, original reflect.Value, depth int) {
 	// based off: https://gist.github.com/hvoecking/10772475
+	pkgPath := original.Type().PkgPath()
+
+	if pkgPath == "time" {
+		return
+	}
+
+	fmt.Println("Ok, got something as a value, has PkgPath:", depth, original.Type().PkgPath(), original)
+
 	if original.CanInterface() {
 		iface := original.Interface()
 		setter, ok := iface.(clientSetter)
@@ -202,18 +210,18 @@ func doAssignClient(c *Client, original reflect.Value) {
 		if !originalVal.IsValid() {
 			return
 		}
-		doAssignClient(c, originalVal)
+		doAssignClient(c, originalVal, depth + 1)
 	//case reflect.Interface:
 	//	originalVal := original.Interface()
 	//	doAssignClient(c, originalVal)
 	case reflect.Struct:
 		for i := 0; i < original.NumField(); i += 1 {
-			doAssignClient(c, original.Field(i))
+			doAssignClient(c, original.Field(i), depth + 1)
 		}
 
 	case reflect.Slice:
 		for i := 0; i < original.Len(); i += 1 {
-			doAssignClient(c, original.Index(i))
+			doAssignClient(c, original.Index(i), depth + 1)
 		}
 		//case reflect.Map:
 		// we don't have that case in our model

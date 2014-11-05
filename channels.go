@@ -226,7 +226,7 @@ type PlayParams struct {
 	Lang       string `json:"lang,omitempty"`
 	OffsetMS   int64  `json:"offsetms,omitempty"`
 	SkipMS     int64  `json:"skipms,omitempty"`
-	PlaybackId string `"json:"playbackId,omitempty"`
+	PlaybackId string `json:"playbackId,omitempty"`
 }
 
 func (c *Channel) Record(params RecordParams) (*LiveRecording, error) {
