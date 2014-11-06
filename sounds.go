@@ -21,7 +21,7 @@ func (s *SoundService) List(lang, format string) ([]*Sound, error) {
 		p["format"] = format
 	}
 
-	if _, err := s.client.Get("/sounds", &p, &out, nil); err != nil {
+	if _, err := s.client.Get("/sounds", &p, &out); err != nil {
 		return nil, err
 	}
 	return out, nil
@@ -30,7 +30,7 @@ func (s *SoundService) List(lang, format string) ([]*Sound, error) {
 func (s *SoundService) Get(soundId string) (*Sound, error) {
 	var out *Sound
 
-	if _, err := s.client.Get(fmt.Sprintf("/sounds/%s", soundId), nil, &out, nil); err != nil {
+	if _, err := s.client.Get(fmt.Sprintf("/sounds/%s", soundId), nil, &out); err != nil {
 		return nil, err
 	}
 	return out, nil

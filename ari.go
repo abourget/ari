@@ -92,7 +92,7 @@ func (c *Client) reconnect(ch chan<- interface{}) {
 
 		if err == nil {
 			// Connected successfully
-			fmt.Println("Connected to websocket successfully")
+			fmt.Println("Connected to websocket successfully, registered", c.appName)
 			ch <- &AriConnected{c.reconnections}
 			c.reconnections += 1
 			return
@@ -152,10 +152,28 @@ func (c *Client) listenForMessages(ch chan<- interface{}) {
 			recvMsg = &ChannelTalkingFinished{}
 		case "ChannelDialplan":
 			recvMsg = &ChannelDialplan{}
+		case "ChannelCallerId":
+			recvMsg = &ChannelCallerId{}
+		case "ChannelStateChange":
+			recvMsg = &ChannelStateChange{}
+		case "ChannelEnteredBridge":
+			recvMsg = &ChannelEnteredBridge{}
+		case "ChannelLeftBridge":
+			recvMsg = &ChannelLeftBridge{}
 		case "ChannelCreated":
 			recvMsg = &ChannelCreated{}
 		case "ChannelDestroyed":
 			recvMsg = &ChannelDestroyed{}
+		case "BridgeCreated":
+			recvMsg = &BridgeCreated{}
+		case "BridgeDestroyed":
+			recvMsg = &BridgeDestroyed{}
+		case "BridgeMerged":
+			recvMsg = &BridgeMerged{}
+		case "BridgeBlindTransfer":
+			recvMsg = &BridgeBlindTransfer{}
+		case "BridgeAttendedTransfer":
+			recvMsg = &BridgeAttendedTransfer{}
 		case "StasisEnd":
 			recvMsg = &StasisEnd{}
 		default:
@@ -193,7 +211,7 @@ func doAssignClient(c *Client, original reflect.Value, depth int) {
 		return
 	}
 
-	fmt.Println("Ok, got something as a value, has PkgPath:", depth, original.Type().PkgPath(), original)
+	//fmt.Println("Ok, got something as a value, has PkgPath:", depth, original.Type().PkgPath(), original)
 
 	if original.CanInterface() {
 		iface := original.Interface()
@@ -210,18 +228,18 @@ func doAssignClient(c *Client, original reflect.Value, depth int) {
 		if !originalVal.IsValid() {
 			return
 		}
-		doAssignClient(c, originalVal, depth + 1)
+		doAssignClient(c, originalVal, depth+1)
 	//case reflect.Interface:
 	//	originalVal := original.Interface()
 	//	doAssignClient(c, originalVal)
 	case reflect.Struct:
 		for i := 0; i < original.NumField(); i += 1 {
-			doAssignClient(c, original.Field(i), depth + 1)
+			doAssignClient(c, original.Field(i), depth+1)
 		}
 
 	case reflect.Slice:
 		for i := 0; i < original.Len(); i += 1 {
-			doAssignClient(c, original.Index(i), depth + 1)
+			doAssignClient(c, original.Index(i), depth+1)
 		}
 		//case reflect.Map:
 		// we don't have that case in our model

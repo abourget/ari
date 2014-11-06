@@ -13,7 +13,7 @@ type RecordingService struct {
 func (s *RecordingService) ListStored() ([]*StoredRecording, error) {
 	var out []*StoredRecording
 
-	if _, err := s.client.Get("/recordings/stored", nil, &out, nil); err != nil {
+	if _, err := s.client.Get("/recordings/stored", nil, &out); err != nil {
 		return nil, err
 	}
 
@@ -24,7 +24,7 @@ func (s *RecordingService) ListStored() ([]*StoredRecording, error) {
 func (s *RecordingService) GetStored(recordingName string) (*StoredRecording, error) {
 	var out StoredRecording
 
-	if _, err := s.client.Get(fmt.Sprintf("/recordings/stored/%s", recordingName), nil, &out, nil); err != nil {
+	if _, err := s.client.Get(fmt.Sprintf("/recordings/stored/%s", recordingName), nil, &out); err != nil {
 		return nil, err
 	}
 
@@ -35,7 +35,7 @@ func (s *RecordingService) GetStored(recordingName string) (*StoredRecording, er
 func (s *RecordingService) GetLive(recordingName string) (*LiveRecording, error) {
 	var out LiveRecording
 
-	if _, err := s.client.Get(fmt.Sprintf("/recordings/live/%s", recordingName), nil, &out, nil); err != nil {
+	if _, err := s.client.Get(fmt.Sprintf("/recordings/live/%s", recordingName), nil, &out); err != nil {
 		return nil, err
 	}
 
@@ -44,7 +44,7 @@ func (s *RecordingService) GetLive(recordingName string) (*LiveRecording, error)
 }
 
 func (s *RecordingService) DeleteStored(recordingName string) error {
-	_, err := s.client.Delete(fmt.Sprintf("/recordings/stored/%s", recordingName), nil, nil)
+	_, err := s.client.Delete(fmt.Sprintf("/recordings/stored/%s", recordingName), nil)
 	return err
 }
 
@@ -54,7 +54,7 @@ func (s *RecordingService) CopyStored(recordingName, destinationRecordingName st
 		"destinationRecordingName": destinationRecordingName,
 	}
 
-	if _, err := s.client.Post(fmt.Sprintf("/recordings/stored/%s/copy", recordingName), params, &out, nil); err != nil {
+	if _, err := s.client.Post(fmt.Sprintf("/recordings/stored/%s/copy", recordingName), params, &out); err != nil {
 		return nil, err
 	}
 
@@ -109,31 +109,31 @@ func (l *LiveRecording) setClient(client *Client) {
 }
 
 func (l *LiveRecording) Cancel() error {
-	_, err := l.client.Delete(fmt.Sprintf("/recordings/live/%s", l.Name), nil, nil)
+	_, err := l.client.Delete(fmt.Sprintf("/recordings/live/%s", l.Name), nil)
 	return err
 }
 
 func (l *LiveRecording) Stop() error {
-	_, err := l.client.Post(fmt.Sprintf("/recordings/live/%s/stop", l.Name), nil, nil, nil)
+	_, err := l.client.Post(fmt.Sprintf("/recordings/live/%s/stop", l.Name), nil, nil)
 	return err
 }
 
 func (l *LiveRecording) Pause() error {
-	_, err := l.client.Post(fmt.Sprintf("/recordings/live/%s/pause", l.Name), nil, nil, nil)
+	_, err := l.client.Post(fmt.Sprintf("/recordings/live/%s/pause", l.Name), nil, nil)
 	return err
 }
 
 func (l *LiveRecording) Unpause() error {
-	_, err := l.client.Delete(fmt.Sprintf("/recordings/live/%s/pause", l.Name), nil, nil)
+	_, err := l.client.Delete(fmt.Sprintf("/recordings/live/%s/pause", l.Name), nil)
 	return err
 }
 
 func (l *LiveRecording) Mute() error {
-	_, err := l.client.Post(fmt.Sprintf("/recordings/live/%s/mute", l.Name), nil, nil, nil)
+	_, err := l.client.Post(fmt.Sprintf("/recordings/live/%s/mute", l.Name), nil, nil)
 	return err
 }
 
 func (l *LiveRecording) Unmute() error {
-	_, err := l.client.Delete(fmt.Sprintf("/recordings/live/%s/mute", l.Name), nil, nil)
+	_, err := l.client.Delete(fmt.Sprintf("/recordings/live/%s/mute", l.Name), nil)
 	return err
 }
