@@ -23,6 +23,14 @@ func (c *Outgoing) handleOutgoingMessage(msg interface{}) {
 		fmt.Println("Outgoing: Statis started, detecting speech")
 		m.Channel.SetVar("TALK_DETECT(set)", "")
 
+		// Bridge with the other folk
+		b, err := c.client.Bridges.Get("mycall")
+		if err != nil {
+			fmt.Println(`Outgoing: hmm.. couldn'get "mycall" bridge`)
+			return
+		}
+		b.AddChannel(m.Channel.Id, ari.Participant)
+
 	case *ari.StasisEnd:
 		fmt.Println("Outgoing: Statis ended")
 	case *ari.ChannelDtmfReceived:

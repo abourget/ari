@@ -48,18 +48,18 @@ func (c *CallManager) handleMessage(msg interface{}) {
 				Name:     "my-named-bridge",
 			})
 
-			otherChannel, err := c.client.Channels.Create(ari.OriginateParams{
-				Endpoint: "SIP/voipms/5148888888",
-				App:      "outgoing-call",
-			})
-			if err != nil {
-				fmt.Println("Callmanager: error creating bridge:", err)
-				return
-			}
+			// otherChannel, err := c.client.Channels.Create(ari.OriginateParams{
+			// 	Endpoint: "SIP/voipms/5149221144",
+			// 	App:      "outgoing-call",
+			// })
+			// if err != nil {
+			// 	fmt.Println("Callmanager: error creating bridge:", err)
+			// 	return
+			// }
 
-			c.outgoingChannel = otherChannel
+			// c.outgoingChannel = otherChannel
 
-			c.bridge.AddChannel(otherChannel.Id, ari.Participant)
+			c.bridge.AddChannel(m.Channel.Id, ari.Participant)
 		}
 
 		if m.Digit == "2" {
