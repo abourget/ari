@@ -90,13 +90,15 @@ func (c *Channel) setClient(client *Client) {
 }
 
 func (c *Channel) String() string {
-	s := fmt.Sprintf("Channel %s", c.Id)
+	s := fmt.Sprintf("id=%s", c.Id)
 	if c.Caller != nil {
-		s = fmt.Sprintf(", caller=%s", c.Caller)
+		s = fmt.Sprintf("%s,caller=%s", s, c.Caller)
 	}
 	if c.Connected != nil {
-		s = fmt.Sprintf(", with=%s", c.Connected)
+		s = fmt.Sprintf("%s,with=%s", s, c.Connected)
 	}
+
+	s = fmt.Sprintf("%s,state=%s", s, c.State)
 	return s
 }
 

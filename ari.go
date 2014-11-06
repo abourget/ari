@@ -93,7 +93,10 @@ func (c *Client) reconnect(ch chan<- interface{}) {
 		if err == nil {
 			// Connected successfully
 			fmt.Println("Connected to websocket successfully, registered", c.appName)
-			ch <- &AriConnected{Reconnections: c.reconnections}
+			ch <- &AriConnected{
+				Reconnections: c.reconnections,
+				Event:         Event{Message: Message{Type: "AriConnected"}},
+			}
 			c.reconnections += 1
 			return
 		}
@@ -117,7 +120,7 @@ func (c *Client) listenForMessages(ch chan<- interface{}) {
 		err := websocket.Message.Receive(c.ws, &msg)
 		if err != nil {
 			fmt.Println("Whoops, error reading from Socket, resetting connection")
-			ch <- &AriDisconnected{}
+			ch <- &AriDisconnected{Event: Event{Message: Message{Type: "AriDisconnected"}}}
 			return
 		}
 
