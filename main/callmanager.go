@@ -12,7 +12,8 @@ type CallManager struct {
 	liveRecording   *ari.LiveRecording
 	currentPlayback *ari.Playback
 	bridge          *ari.Bridge
-	calledChannel   *ari.Channel
+	outgoingChannel *ari.Channel
+	managerChannel  *ari.Channel
 }
 
 func (c *CallManager) handleMessage(msg interface{}) {
@@ -21,16 +22,19 @@ func (c *CallManager) handleMessage(msg interface{}) {
 		fmt.Println("CallManager: ARI connected")
 
 	case *ari.StasisStart:
+		fmt.Println("CallManager: Statis started, detecthing speech")
+		c.managerChannel = m.Channel
+
 		c.currentPlayback, _ = m.Channel.Play(ari.PlayParams{
 			Media: "sound:demo-moreinfo",
 		})
 		m.Channel.SetVar("TALK_DETECT(set)", "")
 
 	case *ari.StasisEnd:
-		fmt.Println("Oh well, ended Stasis")
+		fmt.Println("CallManager: Statis ended")
 
 	case *ari.ChannelDtmfReceived:
-		fmt.Println("Got DTMF:", m.Digit)
+		fmt.Println("CallManager: Got DTMF:", m.Digit)
 
 		if c.currentPlayback != nil {
 			c.currentPlayback.Stop()
@@ -53,14 +57,14 @@ func (c *CallManager) handleMessage(msg interface{}) {
 				return
 			}
 
-			c.calledChannel = otherChannel
+			c.outgoingChannel = otherChannel
 
 			c.bridge.AddChannel(otherChannel.Id, ari.Participant)
 		}
 
 		if m.Digit == "2" {
-			if c.calledChannel != nil {
-				c.calledChannel.Hangup()
+			if c.outgoingChannel != nil {
+				c.outgoingChannel.Hangup()
 			}
 		}
 

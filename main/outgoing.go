@@ -14,14 +14,15 @@ type Outgoing struct {
 	bridge          *ari.Bridge
 }
 
-func (c *Outgoing) handleMessage(msg interface{}) {
+func (c *Outgoing) handleOutgoingMessage(msg interface{}) {
 	switch m := msg.(type) {
 	case *ari.AriConnected:
 		fmt.Println("Outgoing: ARI connected")
 
 	case *ari.StasisStart:
-		fmt.Println("Outgoing: Statis started")
+		fmt.Println("Outgoing: Statis started, detecting speech")
 		m.Channel.SetVar("TALK_DETECT(set)", "")
+
 	case *ari.StasisEnd:
 		fmt.Println("Outgoing: Statis ended")
 	case *ari.ChannelDtmfReceived:
@@ -42,7 +43,7 @@ func (c *Outgoing) handleMessage(msg interface{}) {
 		fmt.Println("Outgoing: Playback started")
 
 	case *ari.ChannelStateChange:
-
+		fmt.Printf("Outgoing: ChannelStateChange: %#v\n", m.Channel)
 
 	case *ari.PlaybackFinished:
 		fmt.Println("Outgoing: Playback finished: ", m.Playback.MediaURI)
@@ -58,7 +59,7 @@ func (o *Outgoing) Listen() {
 	for {
 		select {
 		case msg := <-receiveChan:
-			o.handleMessage(msg)
+			o.handleOutgoingMessage(msg)
 		}
 	}
 }
