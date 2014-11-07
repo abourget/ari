@@ -12,5 +12,6 @@ func main() {
 		client: c,
 	}
 
+	birthday.Setup()
 	birthday.Listen()
 }

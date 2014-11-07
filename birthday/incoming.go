@@ -33,12 +33,6 @@ func (b *Birthday) handleIncomingMessage(msg interface{}) {
 		}
 
 		if m.Digit == "1" {
-			b.bridge, _ = b.client.Bridges.Create(ari.CreateBridgeParams{
-				Type:     "mixing,proxy_media,dtmf_events",
-				BridgeId: "mycall",
-				Name:     "my-named-bridge",
-			})
-
 			// otherChannel, err := c.client.Channels.Create(ari.OriginateParams{
 			// 	Endpoint: "SIP/voipms/5149221144",
 			// 	App:      "outgoing-call",
@@ -50,7 +44,7 @@ func (b *Birthday) handleIncomingMessage(msg interface{}) {
 
 			// c.outgoingChannel = otherChannel
 
-			b.bridge.AddChannel(m.Channel.Id, ari.Participant)
+			b.holdingBridge.AddChannel(m.Channel.Id, ari.Participant)
 		}
 
 		if m.Digit == "2" {

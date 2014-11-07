@@ -7,22 +7,19 @@ import (
 	"github.com/kr/pretty"
 )
 
-func (c *Birthday) handleOutgoingMessage(msg interface{}) {
+func (b *Birthday) handleOutgoingMessage(msg interface{}) {
 	switch m := msg.(type) {
 	case *ari.AriConnected:
 		fmt.Println("Outgoing: ARI connected")
 
 	case *ari.StasisStart:
+
 		fmt.Println("Outgoing: Statis started, detecting speech")
 		m.Channel.SetVar("TALK_DETECT(set)", "")
 
 		// Bridge with the other folk
-		b, err := c.client.Bridges.Get("mycall")
-		if err != nil {
-			fmt.Println(`Outgoing: hmm.. couldn'get "mycall" bridge`)
-			return
-		}
-		b.AddChannel(m.Channel.Id, ari.Participant)
+		b.mixingBridge.AddChannel(m.Channel.Id, ari.Participant)
+		b.mixingBridge.AddChannel(b.incomingChannel.Id, ari.Participant)
 
 	case *ari.StasisEnd:
 		fmt.Println("Outgoing: Statis ended")
