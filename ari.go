@@ -54,7 +54,6 @@ func NewClient(username, password, hostname string, port int, appName string) *C
 		appName:  appName,
 		session: &napping.Session{
 			Userinfo:        userinfo,
-			UnsafeBasicAuth: true,
 		},
 		endpoint: endpoint,
 	}
