@@ -72,20 +72,20 @@ func NewClient(username, password, hostname string, port int, appName string) *C
 	return c
 }
 
-func (c *Client) LaunchListener() <-chan interface{} {
-	ch := make(chan interface{}, 100)
+func (c *Client) LaunchListener() <-chan Eventer {
+	ch := make(chan Eventer, 100)
 	go c.handleReceive(ch)
 	return ch
 }
 
-func (c *Client) handleReceive(ch chan<- interface{}) {
+func (c *Client) handleReceive(ch chan<- Eventer) {
 	for {
 		c.reconnect(ch)
 		c.listenForMessages(ch)
 	}
 }
 
-func (c *Client) reconnect(ch chan<- interface{}) {
+func (c *Client) reconnect(ch chan<- Eventer) {
 	for {
 		err := c.connect()
 
@@ -113,7 +113,7 @@ func (c *Client) connect() error {
 	return err
 }
 
-func (c *Client) listenForMessages(ch chan<- interface{}) {
+func (c *Client) listenForMessages(ch chan<- Eventer) {
 	for {
 		var msg string
 		err := websocket.Message.Receive(c.ws, &msg)
@@ -123,7 +123,7 @@ func (c *Client) listenForMessages(ch chan<- interface{}) {
 			return
 		}
 
-		var data Message
+		var data Event
 		rawMsg := []byte(msg)
 		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
@@ -134,7 +134,7 @@ func (c *Client) listenForMessages(ch chan<- interface{}) {
 		//fmt.Printf("  -> %s", msg)
 
 		msgType := data.Type
-		var recvMsg interface{}
+		var recvMsg Eventer
 		switch msgType {
 		case "ChannelVarset":
 			recvMsg = &ChannelVarset{}

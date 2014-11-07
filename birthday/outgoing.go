@@ -7,14 +7,7 @@ import (
 	"github.com/kr/pretty"
 )
 
-type Outgoing struct {
-	client          *ari.Client
-	liveRecording   *ari.LiveRecording
-	currentPlayback *ari.Playback
-	bridge          *ari.Bridge
-}
-
-func (c *Outgoing) handleOutgoingMessage(msg interface{}) {
+func (c *Birthday) handleOutgoingMessage(msg interface{}) {
 	switch m := msg.(type) {
 	case *ari.AriConnected:
 		fmt.Println("Outgoing: ARI connected")
@@ -58,16 +51,5 @@ func (c *Outgoing) handleOutgoingMessage(msg interface{}) {
 
 	default:
 		pretty.Printf("Outgoing: Received some message: %+v\n", msg)
-	}
-}
-
-func (o *Outgoing) Listen() {
-	receiveChan := o.client.LaunchListener()
-
-	for {
-		select {
-		case msg := <-receiveChan:
-			o.handleOutgoingMessage(msg)
-		}
 	}
 }
