@@ -15,11 +15,10 @@ func (b *Birthday) handleOutgoingMessage(msg interface{}) {
 	case *ari.StasisStart:
 
 		fmt.Println("Outgoing: Statis started, detecting speech")
-		m.Channel.SetVar("TALK_DETECT(set)", "")
+		m.Channel.SetVar("TALK_DETECT(set)", "500")
 
 		// Bridge with the other folk
 		b.mixingBridge.AddChannel(m.Channel.Id, ari.Participant)
-		b.mixingBridge.AddChannel(b.incomingChannel.Id, ari.Participant)
 
 	case *ari.StasisEnd:
 		fmt.Println("Outgoing: Statis ended")
@@ -31,11 +30,20 @@ func (b *Birthday) handleOutgoingMessage(msg interface{}) {
 	case *ari.ChannelTalkingFinished:
 		fmt.Println("Outgoing: They stopped talking! Talked for", m.Duration, "ms")
 
+	case *ari.ChannelDestroyed:
+		fmt.Println("Outgoing: Channel destroyed, back to dialing")
+		b.stopOutgoingProcessing()
+		b.outgoingChannel = nil
+		b.incomingChannel.Play(ari.PlayParams{
+			Media: "sound:confbridge-has-left",
+		})
+		b.dtmfControlMode = true
+
 	case *ari.ChannelHangupRequest:
 		fmt.Printf("Outgoing: Hangup for channel %s\n", m.Channel)
 
 	case *ari.ChannelVarset:
-		fmt.Printf("Outgoing: Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
+		//fmt.Printf("Outgoing: Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
 
 	case *ari.PlaybackStarted:
 		fmt.Println("Outgoing: Playback started")

@@ -10,78 +10,70 @@ import (
 func (b *Birthday) handleIncomingMessage(msg interface{}) {
 	switch m := msg.(type) {
 	case *ari.AriConnected:
-		fmt.Println("Incoming: ARI connected")
+		//fmt.Println("Incoming: ARI connected, setting up mixing bridge")
+		b.Setup()
 
 	case *ari.StasisStart:
-		fmt.Println("Incoming: Statis started, detecthing speech")
+		//fmt.Println("Incoming: Statis started, detecting speech")
 		b.incomingChannel = m.Channel
 
 		b.currentPlayback, _ = m.Channel.Play(ari.PlayParams{
-			Media: "sound:demo-moreinfo",
+			Media: "sound:hello-world",
 		})
-		m.Channel.SetVar("TALK_DETECT(set)", "")
+
+		b.mixingBridge.AddChannel(m.Channel.Id, ari.Participant)
 
 	case *ari.StasisEnd:
 		fmt.Println("Incoming: Statis ended")
 
 	case *ari.ChannelDtmfReceived:
-		fmt.Println("Incoming: Got DTMF:", m.Digit)
+		fmt.Println("Incoming: Got DTMF:", b.dtmfDigits, m.Digit)
 
-		if b.currentPlayback != nil {
-			b.currentPlayback.Stop()
-			b.currentPlayback = nil
-		}
-
-		if m.Digit == "1" {
-			// otherChannel, err := c.client.Channels.Create(ari.OriginateParams{
-			// 	Endpoint: "SIP/voipms/5149221144",
-			// 	App:      "outgoing-call",
-			// })
-			// if err != nil {
-			// 	fmt.Println("Incoming: error creating bridge:", err)
-			// 	return
-			// }
-
-			// c.outgoingChannel = otherChannel
-
-			b.holdingBridge.AddChannel(m.Channel.Id, ari.Participant)
-		}
-
-		if m.Digit == "2" {
-			if b.outgoingChannel != nil {
-				b.outgoingChannel.Hangup()
+		if b.dtmfControlMode {
+			if m.Digit == "*" {
+				b.hangupOutgoing()
+				b.dtmfControlMode = false
+			} else if m.Digit == "1" {
+				b.playSong()
+			} else if m.Digit == "4" {
+				b.playAndRecordSong()
+			} else if m.Digit == "7" {
+				b.recordMessage()
+			} else if m.Digit == "#" {
+				b.stopOutgoingProcessing()
 			}
-		}
-
-		if m.Digit == "*" {
-			if b.liveRecording == nil {
-				b.liveRecording, _ = m.Channel.Record(ari.RecordParams{
-					Name:   "superbob",
-					Format: "wav",
-				})
-			} else {
-				b.liveRecording.Stop()
-				b.liveRecording = nil
+		} else {
+			// Dial mode
+			if m.Digit != "#" && m.Digit != "*" {
+				b.dtmfDigits = fmt.Sprintf("%s%s", b.dtmfDigits, m.Digit)
+			} else if m.Digit == "*" {
+				b.dtmfDigits = ""
+			} else if m.Digit == "#" {
+				// Do the dial, and reset digits
+				b.outgoingNumber = b.dtmfDigits
+				b.dialOutgoing(b.outgoingNumber)
+				b.dtmfDigits = ""
 			}
 		}
 
 	case *ari.ChannelTalkingStarted:
-		fmt.Println("Incoming: They started talking!")
+		//fmt.Println("Incoming: They started talking!")
 
 	case *ari.ChannelTalkingFinished:
-		fmt.Println("Incoming: They stopped talking! Talked for", m.Duration, "ms")
+		//fmt.Println("Incoming: They stopped talking! Talked for", m.Duration, "ms")
 
 	case *ari.ChannelHangupRequest:
 		fmt.Printf("Incoming: Hangup for channel %s\n", m.Channel)
+		b.hangupOutgoing()
 
 	case *ari.ChannelVarset:
-		fmt.Printf("Incoming: Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
+		//fmt.Printf("Incoming: Setting channel variable: %s to '%s'\n", m.Variable, m.Value)
 
 	case *ari.PlaybackStarted:
-		fmt.Println("Incoming: Playback started")
+		//fmt.Println("Incoming: Playback started")
 
 	case *ari.PlaybackFinished:
-		fmt.Println("Incoming: Playback finished: ", m.Playback.MediaURI)
+		//fmt.Println("Incoming: Playback finished: ", m.Playback.MediaURI)
 
 	default:
 		pretty.Printf("Incoming: Received some message: %+v\n", msg)

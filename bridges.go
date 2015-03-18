@@ -127,6 +127,7 @@ func (b *Bridge) Play(params PlayParams) (*Playback, error) {
 	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/play", b.Id), &params, &out); err != nil {
 		return nil, err
 	}
+	out.setClient(b.client)
 	return &out, nil
 }
 
@@ -136,5 +137,6 @@ func (b *Bridge) Record(params RecordParams) (*LiveRecording, error) {
 	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/record", b.Id), &params, &out); err != nil {
 		return nil, err
 	}
+	out.setClient(b.client)
 	return &out, nil
 }

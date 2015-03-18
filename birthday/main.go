@@ -5,13 +5,12 @@ package main
 import "github.com/abourget/ari"
 
 func main() {
-	c := ari.NewClient("asterisk", "asterisk", "localhost", 8088, "birthday-incoming,birthday-outgoing")
+	c := ari.NewClient("asterisk", "asterisk", "localhost", 8088, "birthday-incoming,birthday-outgoing,birthday-snoop")
 	c.Debug = true
 
 	birthday := &Birthday{
 		client: c,
 	}
 
-	birthday.Setup()
 	birthday.Listen()
 }
