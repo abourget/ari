@@ -12,7 +12,7 @@ import (
 
 	"github.com/jmcvetta/napping"
 
-	"code.google.com/p/go.net/websocket"
+	"golang.org/x/net/websocket"
 )
 
 type Client struct {
@@ -53,7 +53,7 @@ func NewClient(username, password, hostname string, port int, appName string) *C
 		password: password,
 		appName:  appName,
 		session: &napping.Session{
-			Userinfo:        userinfo,
+			Userinfo: userinfo,
 		},
 		endpoint: endpoint,
 	}
