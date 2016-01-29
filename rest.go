@@ -22,7 +22,8 @@ func (c *Client) Get(url string, p *napping.Params, results interface{}) (*nappi
 	fullUrl := c.makeFullUrl(url)
 	var errMsg errorResponse
 	c.Log("Sending GET request to %s", fullUrl)
-	res, err := c.session.Get(c.makeFullUrl(url), p, results, &errMsg)
+	params := p.AsUrlValues()
+	res, err := c.session.Get(fullUrl, &params, results, &errMsg)
 	return c.checkNappingError(res, err, errMsg)
 }
 
