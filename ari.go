@@ -142,6 +142,8 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 			recvMsg = &ChannelDtmfReceived{}
 		case "ChannelHangupRequest":
 			recvMsg = &ChannelHangupRequest{}
+		case "ChannelConnectedLine":
+			recvMsg = &ChannelConnectedLine{}
 		case "StasisStart":
 			recvMsg = &StasisStart{}
 		case "PlaybackStarted":

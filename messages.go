@@ -130,6 +130,11 @@ type ChannelCreated struct {
 	Channel *Channel
 }
 
+type ChannelConnectedLine struct {
+	Event
+	Channel *Channel
+}
+
 type ChannelDestroyed struct {
 	Event
 	Channel  *Channel
