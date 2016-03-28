@@ -71,3 +71,8 @@ type SystemInfo struct {
 	EntityId string `json:"entity_id"`
 	Version  string
 }
+
+type DeviceState struct {
+	State string
+	Name  string
+}

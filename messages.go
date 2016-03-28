@@ -147,6 +147,11 @@ type PlaybackFinished struct {
 	Playback *Playback
 }
 
+type DeviceStateChanged struct {
+	Event
+	DeviceState *DeviceState `json:"device_state"`
+}
+
 //
 // AsteriskInfo-related
 //

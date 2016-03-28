@@ -176,6 +176,8 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 			recvMsg = &BridgeBlindTransfer{}
 		case "BridgeAttendedTransfer":
 			recvMsg = &BridgeAttendedTransfer{}
+		case "DeviceStateChanged":
+			recvMsg = &DeviceStateChanged{}
 		case "StasisEnd":
 			recvMsg = &StasisEnd{}
 		default:
