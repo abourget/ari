@@ -31,7 +31,7 @@ func (c *Client) Delete(url string, results interface{}) (*napping.Response, err
 	fullUrl := c.makeFullUrl(url)
 	var errMsg errorResponse
 	c.Log("Sending DELETE request to %s", fullUrl)
-	res, err := c.session.Delete(fullUrl, results, &errMsg)
+	res, err := c.session.Delete(fullUrl, nil, results, &errMsg)
 	return c.checkNappingError(res, err, errMsg)
 }
 
