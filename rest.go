@@ -2,6 +2,7 @@ package ari
 
 import (
 	"fmt"
+	"net/url"
 
 	"github.com/jmcvetta/napping"
 )
@@ -18,12 +19,11 @@ func (c *Client) Post(url string, payload, results interface{}) (*napping.Respon
 	return c.checkNappingError(res, err, errMsg)
 }
 
-func (c *Client) Get(url string, p *napping.Params, results interface{}) (*napping.Response, error) {
+func (c *Client) Get(url string, p *url.Values, results interface{}) (*napping.Response, error) {
 	fullUrl := c.makeFullUrl(url)
 	var errMsg errorResponse
 	c.Log("Sending GET request to %s", fullUrl)
-	params := p.AsUrlValues()
-	res, err := c.session.Get(fullUrl, &params, results, &errMsg)
+	res, err := c.session.Get(fullUrl, p, results, &errMsg)
 	return c.checkNappingError(res, err, errMsg)
 }
 

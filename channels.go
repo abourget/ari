@@ -258,8 +258,8 @@ type RecordParams struct {
 
 func (c *Channel) GetVar(variable string) (string, error) {
 	var out Variable
-
-	if _, err := c.client.Get(fmt.Sprintf("/channels/%s/variable", c.Id), &napping.Params{"variable": variable}, &out); err != nil {
+	params := napping.Params{"variable": variable}.AsUrlValues()
+	if _, err := c.client.Get(fmt.Sprintf("/channels/%s/variable", c.Id), &params, &out); err != nil {
 		return "", err
 	}
 	return out.Value, nil

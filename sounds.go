@@ -21,7 +21,8 @@ func (s *SoundService) List(lang, format string) ([]*Sound, error) {
 		p["format"] = format
 	}
 
-	if _, err := s.client.Get("/sounds", &p, &out); err != nil {
+	params := p.AsUrlValues()
+	if _, err := s.client.Get("/sounds", &params, &out); err != nil {
 		return nil, err
 	}
 	return out, nil
