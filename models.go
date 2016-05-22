@@ -27,6 +27,13 @@ type DialplanCEP struct {
 	Priority int
 }
 
+type Dialplan struct {
+	Context  string `json:"context"`
+	Exten    string `json:"extension"`
+	Priority int    `json:"priority"`
+	Label    string `json:"label"`
+}
+
 type FormatLangPair struct {
 	Format   string
 	Language string
@@ -70,4 +77,9 @@ type StatusInfo struct {
 type SystemInfo struct {
 	EntityId string `json:"entity_id"`
 	Version  string
+}
+
+type DeviceState struct {
+	State string
+	Name  string
 }

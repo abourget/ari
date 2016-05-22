@@ -107,8 +107,8 @@ func (c *Channel) Hangup() error {
 	return err
 }
 
-func (c *Channel) ContinueInDialplan(context, exten string, priority int) error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/continue", c.Id), DialplanCEP{context, exten, priority}, nil); err != nil {
+func (c *Channel) ContinueInDialplan(context, exten string, priority int, label string) error {
+	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/continue", c.Id), Dialplan{context, exten, priority, label}, nil); err != nil {
 		return err
 	}
 	return nil
@@ -258,8 +258,8 @@ type RecordParams struct {
 
 func (c *Channel) GetVar(variable string) (string, error) {
 	var out Variable
-
-	if _, err := c.client.Get(fmt.Sprintf("/channels/%s/variable", c.Id), &napping.Params{"variable": variable}, &out); err != nil {
+	params := napping.Params{"variable": variable}.AsUrlValues()
+	if _, err := c.client.Get(fmt.Sprintf("/channels/%s/variable", c.Id), &params, &out); err != nil {
 		return "", err
 	}
 	return out.Value, nil

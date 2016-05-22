@@ -130,6 +130,11 @@ type ChannelCreated struct {
 	Channel *Channel
 }
 
+type ChannelConnectedLine struct {
+	Event
+	Channel *Channel
+}
+
 type ChannelDestroyed struct {
 	Event
 	Channel  *Channel
@@ -145,6 +150,11 @@ type PlaybackStarted struct {
 type PlaybackFinished struct {
 	Event
 	Playback *Playback
+}
+
+type DeviceStateChanged struct {
+	Event
+	DeviceState *DeviceState `json:"device_state"`
 }
 
 //

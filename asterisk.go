@@ -21,8 +21,8 @@ func (s *AsteriskService) GetInfo() (*AsteriskInfo, error) {
 
 func (s *AsteriskService) GetGlobalVar(variable string) (string, error) {
 	var out Variable
-
-	if _, err := s.client.Get("/asterisk/variable", &napping.Params{"variable": variable}, &out); err != nil {
+	params := napping.Params{"variable": variable}.AsUrlValues()
+	if _, err := s.client.Get("/asterisk/variable", &params, &out); err != nil {
 		return "", err
 	}
 	return out.Value, nil
