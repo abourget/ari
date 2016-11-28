@@ -23,6 +23,7 @@ type Client struct {
 	password      string
 	port          int
 	appName       string
+	SubscribeAll  bool
 	reconnections int
 
 	session  *napping.Session
@@ -107,7 +108,7 @@ func (c *Client) reconnect(ch chan<- Eventer) {
 }
 
 func (c *Client) connect() error {
-	url := fmt.Sprintf("ws://%s:%d/ari/events?api_key=%s:%s&app=%s", c.hostname, c.port, c.username, c.password, c.appName)
+	url := fmt.Sprintf("ws://%s:%d/ari/events?api_key=%s:%s&app=%s&subscribeAll=%t", c.hostname, c.port, c.username, c.password, c.appName, c.SubscribeAll)
 	ws, err := websocket.Dial(url, "", "http://localhost")
 	c.ws = ws
 	return err
