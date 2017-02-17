@@ -83,3 +83,13 @@ type DeviceState struct {
 	State string
 	Name  string
 }
+
+type Endpoint struct {
+	Technology string `json:"technology"`
+	Resource   string `json:"resource"`
+	State      string `json:"state"`
+}
+
+type Peer struct {
+	PeerStatus string `json:"peer_status"`
+}

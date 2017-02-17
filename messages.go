@@ -157,6 +157,12 @@ type DeviceStateChanged struct {
 	DeviceState *DeviceState `json:"device_state"`
 }
 
+type PeerStatusChange struct {
+	Event
+	Endpoint *Endpoint `json:"endpoint"`
+	Peer     *Peer     `json:"peer"`
+}
+
 //
 // AsteriskInfo-related
 //
