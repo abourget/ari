@@ -183,6 +183,8 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 			recvMsg = &DeviceStateChanged{}
 		case "StasisEnd":
 			recvMsg = &StasisEnd{}
+		case "PeerStatusChange":
+			recvMsg = &PeerStatusChange{}
 		default:
 			recvMsg = &data
 		}
