@@ -97,7 +97,7 @@ func (c *Client) reconnect(ch chan<- Eventer) {
 				Reconnections: c.reconnections,
 				Event:         Event{Message: Message{Type: "AriConnected"}},
 			}
-			c.reconnections += 1
+			c.reconnections++
 			return
 		}
 
@@ -242,12 +242,12 @@ func doAssignClient(c *Client, original reflect.Value, depth int) {
 	//	originalVal := original.Interface()
 	//	doAssignClient(c, originalVal)
 	case reflect.Struct:
-		for i := 0; i < original.NumField(); i += 1 {
+		for i := 0; i < original.NumField(); i++ {
 			doAssignClient(c, original.Field(i), depth+1)
 		}
 
 	case reflect.Slice:
-		for i := 0; i < original.Len(); i += 1 {
+		for i := 0; i < original.Len(); i++ {
 			doAssignClient(c, original.Index(i), depth+1)
 		}
 		//case reflect.Map:
