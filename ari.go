@@ -3,7 +3,6 @@ package ari
 // Package ari implements the Asterisk ARI interface. See: https://wiki.asterisk.org/wiki/display/AST/Asterisk+12+ARI
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net"
@@ -126,74 +125,16 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 			return
 		}
 
-		var data Event
-		rawMsg := []byte(msg)
-		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
-			fmt.Printf("Error decoding incoming '%#v': %s\n", msg, err)
+			fmt.Printf("Error decoding structured message: %#v\n", err)
 			continue
 		}
 
 		//fmt.Printf("  -> %s", msg)
-
-		msgType := data.Type
-		var recvMsg Eventer
-		switch msgType {
-		case "ChannelVarset":
-			recvMsg = &ChannelVarset{}
-		case "ChannelDtmfReceived":
-			recvMsg = &ChannelDtmfReceived{}
-		case "ChannelHangupRequest":
-			recvMsg = &ChannelHangupRequest{}
-		case "ChannelConnectedLine":
-			recvMsg = &ChannelConnectedLine{}
-		case "StasisStart":
-			recvMsg = &StasisStart{}
-		case "PlaybackStarted":
-			recvMsg = &PlaybackStarted{}
-		case "PlaybackFinished":
-			recvMsg = &PlaybackFinished{}
-		case "ChannelTalkingStarted":
-			recvMsg = &ChannelTalkingStarted{}
-		case "ChannelTalkingFinished":
-			recvMsg = &ChannelTalkingFinished{}
-		case "ChannelDialplan":
-			recvMsg = &ChannelDialplan{}
-		case "ChannelCallerId":
-			recvMsg = &ChannelCallerID{}
-		case "ChannelStateChange":
-			recvMsg = &ChannelStateChange{}
-		case "ChannelEnteredBridge":
-			recvMsg = &ChannelEnteredBridge{}
-		case "ChannelLeftBridge":
-			recvMsg = &ChannelLeftBridge{}
-		case "ChannelCreated":
-			recvMsg = &ChannelCreated{}
-		case "ChannelDestroyed":
-			recvMsg = &ChannelDestroyed{}
-		case "BridgeCreated":
-			recvMsg = &BridgeCreated{}
-		case "BridgeDestroyed":
-			recvMsg = &BridgeDestroyed{}
-		case "BridgeMerged":
-			recvMsg = &BridgeMerged{}
-		case "BridgeBlindTransfer":
-			recvMsg = &BridgeBlindTransfer{}
-		case "BridgeAttendedTransfer":
-			recvMsg = &BridgeAttendedTransfer{}
-		case "DeviceStateChanged":
-			recvMsg = &DeviceStateChanged{}
-		case "StasisEnd":
-			recvMsg = &StasisEnd{}
-		case "PeerStatusChange":
-			recvMsg = &PeerStatusChange{}
-		default:
-			recvMsg = &data
-		}
-		err = json.Unmarshal(rawMsg, recvMsg)
+		recvMsg, err := parseMsg([]byte(msg))
 
 		if err != nil {
-			fmt.Printf("Error decoding structured message: %#v\n", err)
+			fmt.Printf("Error decoding incoming '%#v': %s\n", msg, err)
 			continue
 		}
 
