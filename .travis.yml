@@ -1,0 +1,11 @@
+language: go
+go:
+- 1.8.x
+- 1.9.x
+- master
+before_install:
+- mkdir -p $GOPATH/src/github.com/abourget
+- ln -s $TRAVIS_BUILD_DIR $HOME/gopath/src/github.com/abourget/ || true
+- go get github.com/mattn/goveralls
+script:
+- goveralls -v
