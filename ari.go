@@ -6,8 +6,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"net"
 	"net/url"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/jmcvetta/napping"
@@ -45,7 +47,7 @@ type Client struct {
 
 func NewClient(username, password, hostname string, port int, appName string) *Client {
 	userinfo := url.UserPassword(username, password)
-	endpoint := fmt.Sprintf("http://%s:%d", hostname, port)
+	endpoint := "http://" + net.JoinHostPort(hostname, strconv.Itoa(port))
 
 	c := &Client{
 		hostname: hostname,
