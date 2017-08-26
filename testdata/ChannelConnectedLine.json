@@ -1,0 +1,27 @@
+{
+    "type":"ChannelConnectedLine",
+    "timestamp":"2017-08-26T15:20:12.596+0200",
+    "channel":{
+      "id":"1503753612.1674",
+      "name":"Local/2103@spaeter-00000072;1",
+      "state":"Down",
+      "caller":{
+        "name":"Alice",
+        "number":"123456e0"
+      },
+      "connected":{
+        "name":"Bob",
+        "number":"012345678"
+      },
+      "accountcode":"12",
+      "dialplan":{
+        "context":"spaeter",
+        "exten":"123456e0",
+        "priority":1
+      },
+      "creationtime":"2017-08-26T15:20:12.595+0200",
+      "language":"en"
+    },
+    "asterisk_id":"52:54:00:f2:08:6a",
+    "application":"demo"
+}
