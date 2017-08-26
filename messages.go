@@ -1,5 +1,7 @@
 package ari
 
+import "encoding/json"
+
 // Package models implements the Asterisk ARI Messages structures.  See https://wiki.asterisk.org/wiki/display/AST/Asterisk+12+REST+Data+Models
 
 type StasisStart struct {
@@ -176,4 +178,68 @@ type AriConnected struct {
 // AriDisonnected is an Go library specific message, indicating an error or a disconnection of the WebSocket connection.
 type AriDisconnected struct {
 	Event
+}
+
+func parseMsg(raw []byte) (Eventer, error) {
+	var event Event
+	err := json.Unmarshal(raw, &event)
+	if err != nil {
+		return nil, err
+	}
+
+	var msg Eventer
+	switch event.Type {
+	case "ChannelVarset":
+		msg = &ChannelVarset{}
+	case "ChannelDtmfReceived":
+		msg = &ChannelDtmfReceived{}
+	case "ChannelHangupRequest":
+		msg = &ChannelHangupRequest{}
+	case "ChannelConnectedLine":
+		msg = &ChannelConnectedLine{}
+	case "StasisStart":
+		msg = &StasisStart{}
+	case "PlaybackStarted":
+		msg = &PlaybackStarted{}
+	case "PlaybackFinished":
+		msg = &PlaybackFinished{}
+	case "ChannelTalkingStarted":
+		msg = &ChannelTalkingStarted{}
+	case "ChannelTalkingFinished":
+		msg = &ChannelTalkingFinished{}
+	case "ChannelDialplan":
+		msg = &ChannelDialplan{}
+	case "ChannelCallerId":
+		msg = &ChannelCallerID{}
+	case "ChannelStateChange":
+		msg = &ChannelStateChange{}
+	case "ChannelEnteredBridge":
+		msg = &ChannelEnteredBridge{}
+	case "ChannelLeftBridge":
+		msg = &ChannelLeftBridge{}
+	case "ChannelCreated":
+		msg = &ChannelCreated{}
+	case "ChannelDestroyed":
+		msg = &ChannelDestroyed{}
+	case "BridgeCreated":
+		msg = &BridgeCreated{}
+	case "BridgeDestroyed":
+		msg = &BridgeDestroyed{}
+	case "BridgeMerged":
+		msg = &BridgeMerged{}
+	case "BridgeBlindTransfer":
+		msg = &BridgeBlindTransfer{}
+	case "BridgeAttendedTransfer":
+		msg = &BridgeAttendedTransfer{}
+	case "DeviceStateChanged":
+		msg = &DeviceStateChanged{}
+	case "StasisEnd":
+		msg = &StasisEnd{}
+	case "PeerStatusChange":
+		msg = &PeerStatusChange{}
+	default:
+		return &event, nil
+	}
+
+	return msg, json.Unmarshal(raw, msg)
 }

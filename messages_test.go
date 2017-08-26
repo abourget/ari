@@ -2,12 +2,35 @@ package ari
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestParseMsg(t *testing.T) {
+	assert := assert.New(t)
+	bytes := readFile("ChannelConnectedLine.json")
+
+	msg, err := parseMsg(bytes)
+	assert.Nil(err)
+	assert.IsType(&ChannelConnectedLine{}, msg)
+
+	line := msg.(*ChannelConnectedLine)
+	assert.Equal("demo", line.Application)
+}
+
+func TestParseMsgUnknown(t *testing.T) {
+	assert := assert.New(t)
+	bytes := readFile("Unknown.json")
+
+	msg, err := parseMsg(bytes)
+	assert.Nil(err)
+	assert.IsType(&Event{}, msg)
+	assert.Equal("Unknown", msg.GetType())
+}
 
 func TestChannelConnectedLine(t *testing.T) {
 
@@ -44,6 +67,14 @@ func parseTime(str string) *Time {
 	}
 	ts := Time(timestamp)
 	return &ts
+}
+
+func readFile(filename string) []byte {
+	bytes, err := ioutil.ReadFile("testdata/" + filename)
+	if err != nil {
+		panic(err)
+	}
+	return bytes
 }
 
 func parseJSON(filename string, v interface{}) {
