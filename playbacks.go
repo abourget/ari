@@ -12,10 +12,10 @@ type PlaybackService struct {
 	client *Client
 }
 
-func (s *PlaybackService) Get(playbackId string) (*Playback, error) {
+func (s *PlaybackService) Get(playbackID string) (*Playback, error) {
 	var out Playback
 
-	if _, err := s.client.Get(fmt.Sprintf("/playbacks/%s", playbackId), nil, &out); err != nil {
+	if _, err := s.client.Get(fmt.Sprintf("/playbacks/%s", playbackID), nil, &out); err != nil {
 		return nil, err
 	}
 
@@ -28,7 +28,7 @@ func (s *PlaybackService) Get(playbackId string) (*Playback, error) {
 //
 
 type Playback struct {
-	Id        string
+	ID        string
 	Language  string
 	MediaURI  string `json:"media_uri"`
 	State     string
@@ -45,19 +45,18 @@ func (p *Playback) setClient(client *Client) {
 }
 
 func (p *Playback) Stop() error {
-	_, err := p.client.Delete(fmt.Sprintf("/playbacks/%s", p.Id), nil)
+	_, err := p.client.Delete(fmt.Sprintf("/playbacks/%s", p.ID), nil)
 	return err
 }
 
 func (p *Playback) Control(operation string) (status int, err error) {
 	query := map[string]string{"operation": operation}
-	res, err := p.client.Post(fmt.Sprintf("/playbacks/%s/control", p.Id), query, nil)
+	res, err := p.client.Post(fmt.Sprintf("/playbacks/%s/control", p.ID), query, nil)
 	if err != nil {
-		if res != nil {
-			return res.Status(), err
-		} else {
+		if res == nil {
 			return 0, err
 		}
+		return res.Status(), err
 	}
 	return res.Status(), err
 }

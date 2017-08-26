@@ -21,7 +21,7 @@ func (b *Birthday) handleIncomingMessage(msg interface{}) {
 			Media: "sound:hello-world",
 		})
 
-		b.mixingBridge.AddChannel(m.Channel.Id, ari.Participant)
+		b.mixingBridge.AddChannel(m.Channel.ID, ari.Participant)
 
 	case *ari.StasisEnd:
 		fmt.Println("Incoming: Statis ended")

@@ -12,26 +12,26 @@ import (
 //
 
 func (c *Client) Post(url string, payload, results interface{}) (*napping.Response, error) {
-	fullUrl := c.makeFullUrl(url)
+	fullURL := c.makeFullURL(url)
 	var errMsg errorResponse
-	c.Log("Sending POST request to %s", fullUrl)
-	res, err := c.session.Post(fullUrl, payload, results, &errMsg)
+	c.Log("Sending POST request to %s", fullURL)
+	res, err := c.session.Post(fullURL, payload, results, &errMsg)
 	return c.checkNappingError(res, err, errMsg)
 }
 
 func (c *Client) Get(url string, p *url.Values, results interface{}) (*napping.Response, error) {
-	fullUrl := c.makeFullUrl(url)
+	fullURL := c.makeFullURL(url)
 	var errMsg errorResponse
-	c.Log("Sending GET request to %s", fullUrl)
-	res, err := c.session.Get(fullUrl, p, results, &errMsg)
+	c.Log("Sending GET request to %s", fullURL)
+	res, err := c.session.Get(fullURL, p, results, &errMsg)
 	return c.checkNappingError(res, err, errMsg)
 }
 
 func (c *Client) Delete(url string, results interface{}) (*napping.Response, error) {
-	fullUrl := c.makeFullUrl(url)
+	fullURL := c.makeFullURL(url)
 	var errMsg errorResponse
-	c.Log("Sending DELETE request to %s", fullUrl)
-	res, err := c.session.Delete(fullUrl, nil, results, &errMsg)
+	c.Log("Sending DELETE request to %s", fullURL)
+	res, err := c.session.Delete(fullURL, nil, results, &errMsg)
 	return c.checkNappingError(res, err, errMsg)
 }
 
@@ -39,7 +39,7 @@ type errorResponse struct {
 	Message string
 }
 
-func (c *Client) makeFullUrl(url string) string {
+func (c *Client) makeFullURL(url string) string {
 	return fmt.Sprintf("%s/ari%s", c.endpoint, url)
 }
 

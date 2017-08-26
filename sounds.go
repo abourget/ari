@@ -28,10 +28,10 @@ func (s *SoundService) List(lang, format string) ([]*Sound, error) {
 	return out, nil
 }
 
-func (s *SoundService) Get(soundId string) (*Sound, error) {
+func (s *SoundService) Get(soundID string) (*Sound, error) {
 	var out *Sound
 
-	if _, err := s.client.Get(fmt.Sprintf("/sounds/%s", soundId), nil, &out); err != nil {
+	if _, err := s.client.Get(fmt.Sprintf("/sounds/%s", soundID), nil, &out); err != nil {
 		return nil, err
 	}
 	return out, nil

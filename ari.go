@@ -160,7 +160,7 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 		case "ChannelDialplan":
 			recvMsg = &ChannelDialplan{}
 		case "ChannelCallerId":
-			recvMsg = &ChannelCallerId{}
+			recvMsg = &ChannelCallerID{}
 		case "ChannelStateChange":
 			recvMsg = &ChannelStateChange{}
 		case "ChannelEnteredBridge":
