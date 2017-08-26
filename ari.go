@@ -128,7 +128,7 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 		rawMsg := []byte(msg)
 		err = json.Unmarshal(rawMsg, &data)
 		if err != nil {
-			fmt.Printf("Error decoding incoming '%#v': %s", msg, err)
+			fmt.Printf("Error decoding incoming '%#v': %s\n", msg, err)
 			continue
 		}
 
@@ -191,7 +191,7 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 		err = json.Unmarshal(rawMsg, recvMsg)
 
 		if err != nil {
-			fmt.Println("Error decoding structured message: %#v", err)
+			fmt.Printf("Error decoding structured message: %#v\n", err)
 			continue
 		}
 
@@ -203,7 +203,7 @@ func (c *Client) listenForMessages(ch chan<- Eventer) {
 
 func (c *Client) Log(format string, v ...interface{}) {
 	if c.Debug {
-		log.Printf(fmt.Sprintf("%s: %s\n", c.appName, format), v...)
+		log.Println(c.appName, fmt.Sprintf(format, v...))
 	}
 }
 
