@@ -26,21 +26,21 @@ type Client struct {
 	SubscribeAll  bool
 	reconnections int
 
-	session  *napping.Session
+	session  napping.Session
 	endpoint string
 
 	// Services
-	Channels     *ChannelService
-	Bridges      *BridgeService
-	Applications *ApplicationService
-	Asterisk     *AsteriskService
-	DeviceStates *DeviceStateService
-	Endpoints    *EndpointService
-	Events       *EventService
-	Mailboxes    *MailboxService
-	Playbacks    *PlaybackService
-	Recordings   *RecordingService
-	Sounds       *SoundService
+	Channels     ChannelService
+	Bridges      BridgeService
+	Applications ApplicationService
+	Asterisk     AsteriskService
+	DeviceStates DeviceStateService
+	Endpoints    EndpointService
+	Events       EventService
+	Mailboxes    MailboxService
+	Playbacks    PlaybackService
+	Recordings   RecordingService
+	Sounds       SoundService
 }
 
 func NewClient(username, password, hostname string, port int, appName string) *Client {
@@ -53,22 +53,22 @@ func NewClient(username, password, hostname string, port int, appName string) *C
 		username: username,
 		password: password,
 		appName:  appName,
-		session: &napping.Session{
+		session: napping.Session{
 			Userinfo: userinfo,
 		},
 		endpoint: endpoint,
 	}
-	c.Channels = &ChannelService{client: c}
-	c.Bridges = &BridgeService{client: c}
-	c.Sounds = &SoundService{client: c}
-	c.Playbacks = &PlaybackService{client: c}
-	c.Asterisk = &AsteriskService{client: c}
-	c.Mailboxes = &MailboxService{client: c}
-	c.Recordings = &RecordingService{client: c}
-	c.Events = &EventService{client: c}
-	c.Applications = &ApplicationService{client: c}
-	c.DeviceStates = &DeviceStateService{client: c}
-	c.Endpoints = &EndpointService{client: c}
+	c.Channels.client = c
+	c.Bridges.client = c
+	c.Sounds.client = c
+	c.Playbacks.client = c
+	c.Asterisk.client = c
+	c.Mailboxes.client = c
+	c.Recordings.client = c
+	c.Events.client = c
+	c.Applications.client = c
+	c.DeviceStates.client = c
+	c.Endpoints.client = c
 
 	return c
 }
