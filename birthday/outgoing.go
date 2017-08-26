@@ -18,7 +18,7 @@ func (b *Birthday) handleOutgoingMessage(msg interface{}) {
 		m.Channel.SetVar("TALK_DETECT(set)", "500")
 
 		// Bridge with the other folk
-		b.mixingBridge.AddChannel(m.Channel.Id, ari.Participant)
+		b.mixingBridge.AddChannel(m.Channel.ID, ari.Participant)
 
 	case *ari.StasisEnd:
 		fmt.Println("Outgoing: Statis ended")

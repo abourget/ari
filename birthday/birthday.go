@@ -31,7 +31,7 @@ func (b *Birthday) Setup() {
 	// Create holding and mixing bridges
 	mixingBridge, _ := b.client.Bridges.Create(ari.CreateBridgeParams{
 		Type:     "mixing,proxy_media",
-		BridgeId: "birthday-mixing",
+		BridgeID: "birthday-mixing",
 		Name:     "Birthday App mixing bridge",
 	})
 

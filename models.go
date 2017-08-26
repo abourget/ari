@@ -17,7 +17,7 @@ func (c *CallerID) String() string {
 
 type Sound struct {
 	Formats []FormatLangPair
-	Id      string
+	ID      string
 	Text    string
 }
 
@@ -61,10 +61,10 @@ type ConfigInfo struct {
 	MaxLoad         float64 `json:"max_load"`
 	MaxOpenFiles    int64   `json:"max_open_files"`
 	Name            string
-	SetId           SetId
+	SetID           SetID
 }
 
-type SetId struct {
+type SetID struct {
 	Group string
 	User  string
 }
@@ -75,7 +75,7 @@ type StatusInfo struct {
 }
 
 type SystemInfo struct {
-	EntityId string `json:"entity_id"`
+	EntityID string `json:"entity_id"`
 	Version  string
 }
 

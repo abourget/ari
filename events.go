@@ -11,7 +11,7 @@ type Message struct {
 type Event struct {
 	Message
 	Application string
-	Timestamp   *Time
+	Timestamp   *Time `json:"timestamp"`
 }
 
 func (e Event) GetApplication() string {

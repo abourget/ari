@@ -118,7 +118,7 @@ type ChannelDialplan struct {
 	DialplanAppData string `json:"dialplan_app_data"`
 }
 
-type ChannelCallerId struct {
+type ChannelCallerID struct {
 	Event
 	CallerPresentation    int64  `json:"caller_presentation"`
 	CallerPresentationTxt string `json:"caller_presentation_txt"`
