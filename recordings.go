@@ -75,9 +75,7 @@ type StoredRecording struct {
 }
 
 func (s *StoredRecording) setClient(client *Client) {
-	if s != nil {
-		s.client = client
-	}
+	s.client = client
 }
 
 func (s *StoredRecording) Delete() error {
@@ -103,9 +101,7 @@ type LiveRecording struct {
 }
 
 func (l *LiveRecording) setClient(client *Client) {
-	if l != nil {
-		l.client = client
-	}
+	l.client = client
 }
 
 func (l *LiveRecording) Cancel() error {

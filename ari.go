@@ -166,10 +166,11 @@ func doAssignClient(c *Client, original reflect.Value, depth int) {
 	//fmt.Println("Ok, got something as a value, has PkgPath:", depth, original.Type().PkgPath(), original)
 
 	if original.CanInterface() {
-		iface := original.Interface()
-		setter, ok := iface.(clientSetter)
+		setter, ok := original.Interface().(clientSetter)
 		if ok {
-			setter.setClient(c)
+			if !original.IsNil() {
+				setter.setClient(c)
+			}
 			return
 		}
 	}

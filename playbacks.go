@@ -39,9 +39,7 @@ type Playback struct {
 }
 
 func (p *Playback) setClient(client *Client) {
-	if p != nil {
-		p.client = client
-	}
+	p.client = client
 }
 
 func (p *Playback) Stop() error {

@@ -43,9 +43,7 @@ type Application struct {
 }
 
 func (a *Application) setClient(client *Client) {
-	if a != nil {
-		a.client = client
-	}
+	a.client = client
 }
 
 func (a *Application) Subscribe(eventSource string) (*Application, error) {

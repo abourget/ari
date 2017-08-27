@@ -64,9 +64,7 @@ type Bridge struct {
 }
 
 func (b *Bridge) setClient(client *Client) {
-	if b != nil {
-		b.client = client
-	}
+	b.client = client
 }
 
 func (b *Bridge) Destroy() error {

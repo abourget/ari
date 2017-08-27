@@ -84,9 +84,7 @@ type Channel struct {
 }
 
 func (c *Channel) setClient(client *Client) {
-	if c != nil {
-		c.client = client
-	}
+	c.client = client
 }
 
 func (c *Channel) String() string {
