@@ -11,6 +11,7 @@ const timeFormat = "2006-01-02T15:04:05.999-0700"
 // Time is a type alias for time.Time with custom marshaling
 type Time time.Time
 
+// UnmarshalJSON unmarshals the JSON input
 func (j *Time) UnmarshalJSON(input []byte) error {
 	// ARI stamps in this format: "2014-10-30T06:04:39.113+0000"
 	strInput := string(input)

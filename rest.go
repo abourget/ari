@@ -11,6 +11,7 @@ import (
 // napping Post/Get/Delete wrappers
 //
 
+// Post does POST request
 func (c *Client) Post(url string, payload, results interface{}) (*napping.Response, error) {
 	fullURL := c.makeFullURL(url)
 	var errMsg errorResponse
@@ -19,6 +20,7 @@ func (c *Client) Post(url string, payload, results interface{}) (*napping.Respon
 	return c.checkNappingError(res, err, errMsg)
 }
 
+// Get does GET request
 func (c *Client) Get(url string, p *url.Values, results interface{}) (*napping.Response, error) {
 	fullURL := c.makeFullURL(url)
 	var errMsg errorResponse
@@ -27,6 +29,7 @@ func (c *Client) Get(url string, p *url.Values, results interface{}) (*napping.R
 	return c.checkNappingError(res, err, errMsg)
 }
 
+// Delete does DELETE request
 func (c *Client) Delete(url string, results interface{}) (*napping.Response, error) {
 	fullURL := c.makeFullURL(url)
 	var errMsg errorResponse
