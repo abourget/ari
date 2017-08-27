@@ -28,5 +28,5 @@ func (j *Time) UnmarshalJSON(input []byte) error {
 // FIXME: This doesn't work to improve "pretty.Formatter"
 func (j *Time) MarshalText() ([]byte, error) {
 	t := time.Time(*j)
-	return []byte(t.Format("2006-01-02T15:04:05.999-0700")), nil
+	return []byte(t.Format(timeFormat)), nil
 }
