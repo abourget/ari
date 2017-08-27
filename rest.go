@@ -19,10 +19,10 @@ func (c *Client) Post(path string, payload, results interface{}) error {
 
 // PostWithResponse does POST request and returns the response
 func (c *Client) PostWithResponse(path string, payload, results interface{}) (*napping.Response, error) {
-	fullURL := c.makeFullURL(path)
+	url := c.makeURL(path)
 	var errMsg errorResponse
-	c.Log("Sending POST request to %s", fullURL)
-	res, err := c.session.Post(fullURL, payload, results, &errMsg)
+	c.Log("Sending POST request to %s", url)
+	res, err := c.session.Post(url, payload, results, &errMsg)
 	if results != nil {
 		c.setClientRecurse(results)
 	}
@@ -31,10 +31,10 @@ func (c *Client) PostWithResponse(path string, payload, results interface{}) (*n
 
 // Get does GET request
 func (c *Client) Get(path string, p *url.Values, results interface{}) error {
-	fullURL := c.makeFullURL(path)
+	url := c.makeURL(path)
 	var errMsg errorResponse
-	c.Log("Sending GET request to %s", fullURL)
-	res, err := c.session.Get(fullURL, p, results, &errMsg)
+	c.Log("Sending GET request to %s", url)
+	res, err := c.session.Get(url, p, results, &errMsg)
 	if results != nil {
 		c.setClientRecurse(results)
 	}
@@ -43,10 +43,10 @@ func (c *Client) Get(path string, p *url.Values, results interface{}) error {
 
 // Delete does DELETE request
 func (c *Client) Delete(path string, results interface{}) error {
-	fullURL := c.makeFullURL(path)
+	url := c.makeURL(path)
 	var errMsg errorResponse
-	c.Log("Sending DELETE request to %s", fullURL)
-	res, err := c.session.Delete(fullURL, nil, results, &errMsg)
+	c.Log("Sending DELETE request to %s", url)
+	res, err := c.session.Delete(url, nil, results, &errMsg)
 	if results != nil {
 		c.setClientRecurse(results)
 	}
@@ -57,7 +57,7 @@ type errorResponse struct {
 	Message string
 }
 
-func (c *Client) makeFullURL(path string) string {
+func (c *Client) makeURL(path string) string {
 	return fmt.Sprintf("%s/ari%s", c.endpoint, path)
 }
 
