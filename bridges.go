@@ -8,24 +8,12 @@ type BridgeService struct {
 
 func (s *BridgeService) List() ([]*Bridge, error) {
 	var out []*Bridge
-
-	if _, err := s.client.Get("/bridges", nil, &out); err != nil {
-		return nil, err
-	}
-
-	s.client.setClientRecurse(out)
-	return out, nil
+	return out, s.client.Get("/bridges", nil, &out)
 }
 
 func (s *BridgeService) Create(params CreateBridgeParams) (*Bridge, error) {
 	var out Bridge
-
-	if _, err := s.client.Post("/bridges", params, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(s.client)
-	return &out, nil
+	return &out, s.client.Post("/bridges", params, &out)
 }
 
 type CreateBridgeParams struct {
@@ -36,18 +24,11 @@ type CreateBridgeParams struct {
 
 func (s *BridgeService) Get(bridgeID string) (*Bridge, error) {
 	var out Bridge
-
-	if _, err := s.client.Get(fmt.Sprintf("/bridges/%s", bridgeID), nil, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(s.client)
-	return &out, nil
+	return &out, s.client.Get(fmt.Sprintf("/bridges/%s", bridgeID), nil, &out)
 }
 
 func (s *BridgeService) Destroy(bridgeID string) error {
-	_, err := s.client.Delete(fmt.Sprintf("/bridges/%s", bridgeID), nil)
-	return err
+	return s.client.Delete(fmt.Sprintf("/bridges/%s", bridgeID), nil)
 }
 
 type Bridge struct {
@@ -68,8 +49,7 @@ func (b *Bridge) setClient(client *Client) {
 }
 
 func (b *Bridge) Destroy() error {
-	_, err := b.client.Delete(fmt.Sprintf("/bridges/%s", b.ID), nil)
-	return err
+	return b.client.Delete(fmt.Sprintf("/bridges/%s", b.ID), nil)
 }
 
 // AddChannel adds a channel to a bridge. `role` can be `participant` or `announcer`
@@ -78,10 +58,7 @@ func (b *Bridge) AddChannel(channel string, role RoleType) error {
 		"channel": channel,
 		"role":    string(role),
 	}
-	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/addChannel", b.ID), params, nil); err != nil {
-		return err
-	}
-	return nil
+	return b.client.Post(fmt.Sprintf("/bridges/%s/addChannel", b.ID), params, nil)
 }
 
 type RoleType string
@@ -95,10 +72,7 @@ func (b *Bridge) RemoveChannel(channel string) error {
 	params := map[string]string{
 		"channel": channel,
 	}
-	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/removeChannel", b.ID), params, nil); err != nil {
-		return err
-	}
-	return nil
+	return b.client.Post(fmt.Sprintf("/bridges/%s/removeChannel", b.ID), params, nil)
 }
 
 // StartMOH starts Music on hold. If mohClass is "", it will not be sent as a param on the request.
@@ -107,34 +81,21 @@ func (b *Bridge) StartMOH(mohClass string) error {
 	if mohClass != "" {
 		payload = map[string]string{"mohClass": mohClass}
 	}
-	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/moh", b.ID), payload, nil); err != nil {
-		return err
-	}
-	return nil
+	return b.client.Post(fmt.Sprintf("/bridges/%s/moh", b.ID), payload, nil)
 
 }
 
 func (b *Bridge) StopMOH() error {
-	_, err := b.client.Delete(fmt.Sprintf("/bridges/%s/moh", b.ID), nil)
-	return err
+	return b.client.Delete(fmt.Sprintf("/bridges/%s/moh", b.ID), nil)
 }
 
 func (b *Bridge) Play(params PlayParams) (*Playback, error) {
 	var out Playback
-
-	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/play", b.ID), &params, &out); err != nil {
-		return nil, err
-	}
-	out.setClient(b.client)
-	return &out, nil
+	return &out, b.client.Post(fmt.Sprintf("/bridges/%s/play", b.ID), &params, &out)
 }
 
 func (b *Bridge) Record(params RecordParams) (*LiveRecording, error) {
 	var out LiveRecording
 
-	if _, err := b.client.Post(fmt.Sprintf("/bridges/%s/record", b.ID), &params, &out); err != nil {
-		return nil, err
-	}
-	out.setClient(b.client)
-	return &out, nil
+	return &out, b.client.Post(fmt.Sprintf("/bridges/%s/record", b.ID), &params, &out)
 }

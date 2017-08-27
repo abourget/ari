@@ -11,24 +11,13 @@ type ApplicationService struct {
 
 func (s *ApplicationService) List() ([]*Application, error) {
 	var out []*Application
-
-	if _, err := s.client.Get("/applications", nil, &out); err != nil {
-		return nil, err
-	}
-
-	s.client.setClientRecurse(out)
-	return out, nil
+	return out, s.client.Get("/applications", nil, &out)
 }
 
 func (s *ApplicationService) Get(applicationName string) (*Application, error) {
 	var out Application
 
-	if _, err := s.client.Get(fmt.Sprintf("/applications/%s", applicationName), nil, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(s.client)
-	return &out, nil
+	return &out, s.client.Get(fmt.Sprintf("/applications/%s", applicationName), nil, &out)
 }
 
 type Application struct {
@@ -51,21 +40,10 @@ func (a *Application) Subscribe(eventSource string) (*Application, error) {
 	params := map[string]string{
 		"eventSource": eventSource,
 	}
-	if _, err := a.client.Post(fmt.Sprintf("/applications/%s/subscription", a.Name), params, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(a.client)
-	return &out, nil
+	return &out, a.client.Post(fmt.Sprintf("/applications/%s/subscription", a.Name), params, &out)
 }
 
 func (a *Application) Unsubscribe(eventSource string) (*Application, error) {
 	var out Application
-
-	if _, err := a.client.Delete(fmt.Sprintf("/applications/%s/subscription?eventSource=%s", a.Name, url.QueryEscape(eventSource)), &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(a.client)
-	return &out, nil
+	return &out, a.client.Delete(fmt.Sprintf("/applications/%s/subscription?eventSource=%s", a.Name, url.QueryEscape(eventSource)), &out)
 }

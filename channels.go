@@ -16,39 +16,21 @@ type ChannelService struct {
 
 func (s *ChannelService) List() ([]*Channel, error) {
 	var out []*Channel
-
-	if _, err := s.client.Get("/channels", nil, &out); err != nil {
-		return nil, err
-	}
-
-	s.client.setClientRecurse(out)
-	return out, nil
+	return out, s.client.Get("/channels", nil, &out)
 }
 
 func (s *ChannelService) Create(params OriginateParams) (*Channel, error) {
 	var out Channel
-	if _, err := s.client.Post("/channels", params, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(s.client)
-	return &out, nil
+	return &out, s.client.Post("/channels", params, &out)
 }
 
 func (s *ChannelService) Get(channelID string) (*Channel, error) {
 	var out Channel
-
-	if _, err := s.client.Get(fmt.Sprintf("/channels/%s", channelID), nil, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(s.client)
-	return &out, nil
+	return &out, s.client.Get(fmt.Sprintf("/channels/%s", channelID), nil, &out)
 }
 
 func (s *ChannelService) Hangup(channelID string) error {
-	_, err := s.client.Delete(fmt.Sprintf("/channels/%s", channelID), nil)
-	return err
+	return s.client.Delete(fmt.Sprintf("/channels/%s", channelID), nil)
 }
 
 type OriginateParams struct {
@@ -101,34 +83,23 @@ func (c *Channel) String() string {
 }
 
 func (c *Channel) Hangup() error {
-	_, err := c.client.Delete(fmt.Sprintf("/channels/%s", c.ID), nil)
-	return err
+	return c.client.Delete(fmt.Sprintf("/channels/%s", c.ID), nil)
 }
 
 func (c *Channel) ContinueInDialplan(context, exten string, priority int, label string) error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/continue", c.ID), Dialplan{context, exten, priority, label}, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/continue", c.ID), Dialplan{context, exten, priority, label}, nil)
 }
 
 func (c *Channel) Answer() error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/answer", c.ID), nil, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/answer", c.ID), nil, nil)
 }
 
 func (c *Channel) Ring() error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/ring", c.ID), nil, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/ring", c.ID), nil, nil)
 }
 
 func (c *Channel) RingStop() error {
-	_, err := c.client.Delete(fmt.Sprintf("/channels/%s/ring", c.ID), nil)
-	return err
+	return c.client.Delete(fmt.Sprintf("/channels/%s/ring", c.ID), nil)
 }
 
 // SendDTMF sends DTMF signals to the channel. It accepts either a string or a ChannelDTMFSend object.
@@ -143,10 +114,7 @@ func (c *Channel) SendDTMF(dtmf interface{}) error {
 		panic("Invalid type for `dtmf` param in ChannelsDTMFPostById")
 	}
 
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/dtmf", c.ID), dtmfSend, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/dtmf", c.ID), dtmfSend, nil)
 }
 
 type DTMFParams struct {
@@ -159,28 +127,20 @@ type DTMFParams struct {
 
 // ChannelsMutePostById mutes a channel. Use `direction="both"` for default behavior.
 func (c *Channel) Mute(direction string) error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/mute", c.ID), map[string]string{"direction": direction}, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/mute", c.ID), map[string]string{"direction": direction}, nil)
 }
 
 // ChannelsMuteDeleteById unmutes a channel. Use `direction="both"` for default behavior.
 func (c *Channel) Unmute(direction string) error {
-	_, err := c.client.Delete(fmt.Sprintf("/channels/%s/mute?direction=%s", c.ID, direction), nil)
-	return err
+	return c.client.Delete(fmt.Sprintf("/channels/%s/mute?direction=%s", c.ID, direction), nil)
 }
 
 func (c *Channel) Hold() error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/hold", c.ID), nil, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/hold", c.ID), nil, nil)
 }
 
 func (c *Channel) StopHold() error {
-	_, err := c.client.Delete(fmt.Sprintf("/channels/%s/hold", c.ID), nil)
-	return err
+	return c.client.Delete(fmt.Sprintf("/channels/%s/hold", c.ID), nil)
 }
 
 // StartMOH starts Music on hold. If mohClass is "", it will not be sent as a param on the request.
@@ -189,40 +149,26 @@ func (c *Channel) StartMOH(mohClass string) error {
 	if mohClass != "" {
 		payload = map[string]string{"mohClass": mohClass}
 	}
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/moh", c.ID), payload, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/moh", c.ID), payload, nil)
 
 }
 
 func (c *Channel) StopMOH() error {
-	_, err := c.client.Delete(fmt.Sprintf("/channels/%s/moh", c.ID), nil)
-	return err
+	return c.client.Delete(fmt.Sprintf("/channels/%s/moh", c.ID), nil)
 }
 
 func (c *Channel) StartSilence() error {
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/silence", c.ID), nil, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/silence", c.ID), nil, nil)
 }
 
 func (c *Channel) StopSilence() error {
-	_, err := c.client.Delete(fmt.Sprintf("/channels/%s/silence", c.ID), nil)
-	return err
+	return c.client.Delete(fmt.Sprintf("/channels/%s/silence", c.ID), nil)
 }
 
 // Play plays media through channel. See: https://wiki.asterisk.org/wiki/display/AST/ARI+and+Channels%3A+Simple+Media+Manipulation
 func (c *Channel) Play(params PlayParams) (*Playback, error) {
 	var out Playback
-
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/play", c.ID), &params, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(c.client)
-	return &out, nil
+	return &out, c.client.Post(fmt.Sprintf("/channels/%s/play", c.ID), &params, &out)
 }
 
 type PlayParams struct {
@@ -235,13 +181,7 @@ type PlayParams struct {
 
 func (c *Channel) Record(params RecordParams) (*LiveRecording, error) {
 	var out LiveRecording
-
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/record", c.ID), &params, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(c.client)
-	return &out, nil
+	return &out, c.client.Post(fmt.Sprintf("/channels/%s/record", c.ID), &params, &out)
 }
 
 type RecordParams struct {
@@ -257,30 +197,19 @@ type RecordParams struct {
 func (c *Channel) GetVar(variable string) (string, error) {
 	var out Variable
 	params := napping.Params{"variable": variable}.AsUrlValues()
-	if _, err := c.client.Get(fmt.Sprintf("/channels/%s/variable", c.ID), &params, &out); err != nil {
-		return "", err
-	}
-	return out.Value, nil
+	err := c.client.Get(fmt.Sprintf("/channels/%s/variable", c.ID), &params, &out)
+	return out.Value, err
 }
 
 func (c *Channel) SetVar(variable, value string) error {
 	payload := map[string]string{"variable": variable, "value": value}
 
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/variable", c.ID), payload, nil); err != nil {
-		return err
-	}
-	return nil
+	return c.client.Post(fmt.Sprintf("/channels/%s/variable", c.ID), payload, nil)
 }
 
 func (c *Channel) Snoop(params SnoopParams) (*Channel, error) {
 	var out Channel
-
-	if _, err := c.client.Post(fmt.Sprintf("/channels/%s/snoop", c.ID), params, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(c.client)
-	return &out, nil
+	return &out, c.client.Post(fmt.Sprintf("/channels/%s/snoop", c.ID), params, &out)
 
 }
 

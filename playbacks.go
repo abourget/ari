@@ -14,13 +14,7 @@ type PlaybackService struct {
 
 func (s *PlaybackService) Get(playbackID string) (*Playback, error) {
 	var out Playback
-
-	if _, err := s.client.Get(fmt.Sprintf("/playbacks/%s", playbackID), nil, &out); err != nil {
-		return nil, err
-	}
-
-	out.setClient(s.client)
-	return &out, nil
+	return &out, s.client.Get(fmt.Sprintf("/playbacks/%s", playbackID), nil, &out)
 }
 
 //
@@ -43,13 +37,12 @@ func (p *Playback) setClient(client *Client) {
 }
 
 func (p *Playback) Stop() error {
-	_, err := p.client.Delete(fmt.Sprintf("/playbacks/%s", p.ID), nil)
-	return err
+	return p.client.Delete(fmt.Sprintf("/playbacks/%s", p.ID), nil)
 }
 
 func (p *Playback) Control(operation string) (status int, err error) {
 	query := map[string]string{"operation": operation}
-	res, err := p.client.Post(fmt.Sprintf("/playbacks/%s/control", p.ID), query, nil)
+	res, err := p.client.PostWithResponse(fmt.Sprintf("/playbacks/%s/control", p.ID), query, nil)
 	if err != nil {
 		if res == nil {
 			return 0, err

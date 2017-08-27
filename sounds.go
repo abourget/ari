@@ -22,17 +22,10 @@ func (s *SoundService) List(lang, format string) ([]*Sound, error) {
 	}
 
 	params := p.AsUrlValues()
-	if _, err := s.client.Get("/sounds", &params, &out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	return out, s.client.Get("/sounds", &params, &out)
 }
 
 func (s *SoundService) Get(soundID string) (*Sound, error) {
-	var out *Sound
-
-	if _, err := s.client.Get(fmt.Sprintf("/sounds/%s", soundID), nil, &out); err != nil {
-		return nil, err
-	}
-	return out, nil
+	var out Sound
+	return &out, s.client.Get(fmt.Sprintf("/sounds/%s", soundID), nil, &out)
 }
